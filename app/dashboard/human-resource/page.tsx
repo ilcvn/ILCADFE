@@ -79,16 +79,7 @@ function HumanResourcePage() {
         language: languageFilter,
         isShow: isShowFilter,
       });
-
-      const roleOrder = ['PRESIDENT', 'VICE_PRESIDENT', 'CHAIRPERSON', 'VICE_CHAIRMAN', 'MEMBER'];
-
-      const filteredMembers = response.members.sort((a, b) => {
-        const roleA = a.role.split(', ')[0].trim();
-        const roleB = b.role.split(', ')[0].trim();
-        return roleOrder.indexOf(roleA) - roleOrder.indexOf(roleB);
-      });
-
-      setHumanResources(filteredMembers);
+      setHumanResources(response.members);
       setLimit(response.pagination.limit);
       setTotal(response.pagination.total);
     } catch (error: any) {
@@ -226,7 +217,7 @@ function HumanResourcePage() {
         const roles = (row.getValue('role') as string).split(',').map((role) => role.trim()) || [];
 
         return (
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-start gap-2">
             {roles.map((role, index) => {
               const roleLabel = HUMAN_RESOURCE_ROLES_LABEL[role as HumanResourceRole] || 'Không xác định';
               const roleStyle = HUMAN_RESOURCE_ROLE_STYLES[role as HumanResourceRole] || 'bg-gray-100 text-gray-500';

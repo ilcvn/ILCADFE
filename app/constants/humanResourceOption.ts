@@ -13,8 +13,14 @@ export const HUMAN_RESOURCE_OPTIONS = [
 
 export const HUMAN_RESOURCE_PEN_NAME_OPTIONS = [
   { value: 'NA', label: '----' },
-  { value: 'BACHELOR_OF_ECONOMICS_AND_LAW', label: 'Cử Nhân Kinh Tế Luật' },
+  { value: 'BACHELOR', label: 'Cử Nhân' },
+  { value: 'BACHELOR_OF_LAW', label: 'Cử Nhân Luật' },
   { value: 'BACHELOR_OF_ACCOUNTING', label: 'Cử Nhân Kế Toán' },
+  { value: 'BACHELOR_OF_ECONOMICS_AND_LAW', label: 'Cử Nhân Kinh Tế Luật' },
+  { value: 'BACHELOR_OF_INTERNATIONAL_ECONOMICS', label: 'Cử Nhân Kinh Đối Ngoại' },
+  { value: 'BACHELOR_OF_BUSINESS_ADMINISTRATION', label: 'Cử Nhân Quản Trị Kinh Doanh' },
+  { value: 'BACHELOR_OF_FINANCE_AND_BANKING', label: 'Cử Nhân Tài Chính Ngân Hàng' },
+  { value: 'BACHELOR_OF_FINANCE_AND_ACCOUNTING', label: 'Cử Nhân Tài Chính Kế Toán' },
   { value: 'LAWER', label: 'Luật Sư' },
   { value: 'MASTER', label: 'Thạc Sĩ' },
   { value: 'DOCTORATE', label: 'Tiến Sĩ' },
@@ -26,18 +32,18 @@ export const HUMAN_RESOURCE_PEN_NAME_OPTIONS = [
 
 export const HUMAN_RESOURCE_DEPARTMENT_OPTIONS = [
   { value: 'NA', label: '----' },
-  { value: 'ADVISORY_BOARD', label: 'Hội Đồng Cố Vấn' },
   { value: 'BOARD_OF_DIRECTORS', label: 'Ban Lãnh Đạo' },
+  { value: 'ADVISORY_BOARD', label: 'Hội Đồng Cố Vấn' },
   { value: 'SCIENTIFIC_COUNCIL', label: 'Hội Đồng Khoa Học' },
   { value: 'BOARD_OF_MANAGEMERS', label: 'Hội Đồng Quản Lý Viện' },
-  { value: 'SOCIAL_WORK_AND_BUSINESS_SUPPORT_BOARD', label: 'Ban Công Tác Xã Hội Và Hỗ Trợ Doanh Nghiệp, Doanh Nhân' },
   { value: 'INVESTMENT_AND_COMMUNICATION_COOPERATION_DEPARTMENT', label: 'Ban Hợp Tác Đầu Tư Và Truyền Thông' },
+  { value: 'LEGAL_AND_COMMERCIAL_INSTITUTIONS_DEPARTMENT', label: 'Ban Pháp Luật Và Định Chế Thương Mại' },
   { value: 'HUMAN_RESOURCE_TRAINING_AND_DEVELOPMENT_DEPARTMENT', label: 'Ban Đào Tạo Và Phát Triển Nguồn Nhân Lực' },
+  { value: 'DEPARTMENT_OF_ECONOMICS_FINANCE_AND_INTERNATIONAL_TRADE', label: 'Ban Kinh tế - Tài chính và Thương mại quốc tế' },
+  { value: 'SOCIAL_WORK_AND_BUSINESS_SUPPORT_BOARD', label: 'Ban Công Tác Xã Hội Và Hỗ Trợ Doanh Nghiệp, Doanh Nhân' },
   {
     value: 'DEPARTMENT_OF_DIGITAL_ECONOMY_ARTIFICIAL_INTELLIGENCE_AND_BUSINESS_DEVELOPMENT',
     label: 'Ban Kinh Tế Số, Trí Tuệ Nhân Tạo Và Phát Triển Doanh Nghiệp',
   },
-  { value: 'DEPARTMENT_OF_ECONOMICS_FINANCE_AND_INTERNATIONAL_TRADE', label: 'Ban Kinh tế - Tài chính và Thương mại quốc tế' },
-  { value: 'LEGAL_AND_COMMERCIAL_INSTITUTIONS_DEPARTMENT', label: 'Ban Pháp Luật Và Định Chế Thương Mại' },
   { value: 'CHIEF_OF_STAFF', label: 'Chánh Văn Phòng(Văn Phòng Viện)' },
 ];
