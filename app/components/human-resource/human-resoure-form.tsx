@@ -45,7 +45,7 @@ export default function HumanResourceForm({
     {
       department: HUMAN_RESOURCE_DEPARTMENT_OPTIONS[0].value,
       role: HUMAN_RESOURCE_OPTIONS[0].value,
-      penName: HUMAN_RESOURCE_PEN_NAME_OPTIONS[0].value,
+      //penName: HUMAN_RESOURCE_PEN_NAME_OPTIONS[0].value,
     },
   ]);
 
@@ -62,6 +62,7 @@ export default function HumanResourceForm({
     defaultValues: {
       fullName: '',
       gmail: '',
+      penName: '',
       imgUrl: '',
       phone: '',
       description: '',
@@ -70,7 +71,7 @@ export default function HumanResourceForm({
         {
           department: HUMAN_RESOURCE_DEPARTMENT_OPTIONS[0].value,
           role: HUMAN_RESOURCE_OPTIONS[0].value,
-          penName: HUMAN_RESOURCE_PEN_NAME_OPTIONS[0].value,
+          //penName: HUMAN_RESOURCE_PEN_NAME_OPTIONS[0].value,
         },
       ],
     },
@@ -82,7 +83,7 @@ export default function HumanResourceForm({
       {
         department: HUMAN_RESOURCE_DEPARTMENT_OPTIONS[0].value,
         role: HUMAN_RESOURCE_OPTIONS[0].value,
-        penName: HUMAN_RESOURCE_PEN_NAME_OPTIONS[0].value,
+        //penName: HUMAN_RESOURCE_PEN_NAME_OPTIONS[0].value,
       },
     ]);
   };
@@ -95,21 +96,16 @@ export default function HumanResourceForm({
   const [state, submitAction, isPending] = useActionState(async (prevState: any, formData: humanResourceFormData) => {
     try {
       //Kiểm tra ràng buộc giá trị ban đầu đều được chọn
-      let pen = false;
       let de = false;
       let ro = false;
 
       formData.departmentRolePenNames.forEach((item) => {
         if (item.department !== 'NA') de = true;
-        if (item.penName !== 'NA') pen = true;
+        //if (item.penName !== 'NA') pen = true;
         if (item.role !== 'NA') ro = true;
       });
 
       //Điều kiện dừng cho mỗi giá trị
-      if (pen === false) {
-        toast.error('Phải chọn ít nhất một danh xưng');
-        return;
-      }
 
       if (de === false) {
         toast.error('Phải chọn ít nhất một phòng ban');
@@ -133,14 +129,15 @@ export default function HumanResourceForm({
           reset({
             fullName: '',
             gmail: '',
+            penName: '',
             imgUrl: '',
             phone: '',
             description: '',
             language: '',
             department: '',
-            penName: '',
+            //penName: '',
             role: '',
-            departmentRolePenNames: [{ department: '', role: '', penName: '' }],
+            departmentRolePenNames: [{ department: '', role: '', /*penName: ''*/ }],
           });
           setIsDialogOpen(false);
           reloadData?.();
@@ -150,7 +147,7 @@ export default function HumanResourceForm({
             {
               department: HUMAN_RESOURCE_DEPARTMENT_OPTIONS[0].value,
               role: HUMAN_RESOURCE_OPTIONS[0].value,
-              penName: HUMAN_RESOURCE_PEN_NAME_OPTIONS[0].value,
+              //penName: HUMAN_RESOURCE_PEN_NAME_OPTIONS[0].value,
             },
           ]);
         } else {
@@ -163,14 +160,14 @@ export default function HumanResourceForm({
           reset({
             fullName: '',
             gmail: '',
+            penName: '',
             imgUrl: '',
             phone: '',
             description: '',
             language: '',
             department: '',
-            penName: '',
             role: '',
-            departmentRolePenNames: [{ department: '', role: '', penName: '' }],
+            departmentRolePenNames: [{ department: '', role: '', /*penName: ''*/ }],
           });
           setIsDialogOpen(false);
           reloadData?.();
@@ -184,10 +181,10 @@ export default function HumanResourceForm({
   }, undefined);
 
   const onSubmit = (data: humanResourceFormData) => {
-    if (!data.department || !data.role || !data.penName) {
+    if (!data.department || !data.role /*|| !data.penName*/) {
       data.department = HUMAN_RESOURCE_DEPARTMENT_OPTIONS[0].value;
       data.role = HUMAN_RESOURCE_OPTIONS[0].value;
-      data.penName = HUMAN_RESOURCE_PEN_NAME_OPTIONS[0].value;
+      //data.penName = HUMAN_RESOURCE_PEN_NAME_OPTIONS[0].value;
     }
     startTransition(() => {
       submitAction(data);
@@ -212,13 +209,13 @@ export default function HumanResourceForm({
 
       const departments = humanResource.department.split(',').map((penName) => penName.trim()) || [];
       const roles = humanResource.role.split(',').map((penName) => penName.trim()) || [];
-      const penNames = humanResource.penName.split(',').map((penName) => penName.trim()) || [];
+      //const penNames = humanResource.penName.split(',').map((penName) => penName.trim()) || [];
 
       setDepartmentRolesPenNameListAdd(
-        Array.from({ length: Math.max(departments.length, roles.length, penNames.length) }, (_, index) => ({
+        Array.from({ length: Math.max(departments.length, roles.length, /*penNames.length*/) }, (_, index) => ({
           department: departments[index] || HUMAN_RESOURCE_DEPARTMENT_OPTIONS[0].value,
           role: roles[index] || HUMAN_RESOURCE_OPTIONS[0].value,
-          penName: penNames[index] || HUMAN_RESOURCE_PEN_NAME_OPTIONS[0].value,
+          //penName: penNames[index] || HUMAN_RESOURCE_PEN_NAME_OPTIONS[0].value,
         })),
       );
     } else {
@@ -227,7 +224,7 @@ export default function HumanResourceForm({
         {
           department: HUMAN_RESOURCE_DEPARTMENT_OPTIONS[0].value,
           role: HUMAN_RESOURCE_OPTIONS[0].value,
-          penName: HUMAN_RESOURCE_PEN_NAME_OPTIONS[0].value,
+          //penName: HUMAN_RESOURCE_PEN_NAME_OPTIONS[0].value,
         },
       ]);
 
@@ -241,7 +238,7 @@ export default function HumanResourceForm({
         penName: '',
         role: '',
         language: '',
-        departmentRolePenNames: [{ department: '', role: '', penName: '' }],
+        departmentRolePenNames: [{ department: '', role: '', /*penName: '' */}],
       });
 
       setValue('language', LANGUAGE_OPTIONS[0].value);
@@ -277,7 +274,7 @@ export default function HumanResourceForm({
       });
 
       // PENNAME
-      let penNames = '';
+      /*let penNames = '';
       departmentRolePenNames.forEach((item) => {
         if (item.penName !== 'NA') {
           if (penNames.length !== 0) {
@@ -285,11 +282,11 @@ export default function HumanResourceForm({
           }
           penNames += item.penName;
         }
-      });
+      });*/
 
       setValue('department', departments);
       setValue('role', roles);
-      setValue('penName', penNames);
+      //setValue('penName', penNames);
     };
 
     updateDepartRolePenNameValues();
@@ -331,6 +328,7 @@ export default function HumanResourceForm({
               {errors.gmail && <p className="text-red-500 text-sm">{errors.gmail.message}</p>}
             </div>
 
+
             <div className="flex flex-col gap-y-2 col-span-4 lg:col-span-1">
               <Label className="">Ngôn ngữ</Label>
               <Select
@@ -356,6 +354,13 @@ export default function HumanResourceForm({
               {errors.language && <p className="text-red-500 text-sm">{errors.language.message}</p>}
             </div>
 
+            {/* PenName */}
+            <div className="flex flex-col gap-y-2 col-span-4 lg:col-span-4">
+              <Label>Danh Xưng</Label>
+              <Input id="penName" placeholder="Luật Sư, Tiến Sĩ, Nguyên Thẩm Phán" {...register('penName')} />
+              {errors.penName && <p className="text-red-500 text-sm">{errors.penName.message}</p>}
+            </div>
+            
             {departmentRolesPenNameListAdd.map((departmentRolesPenName, index) => (
               <div
                 key={index}
@@ -405,7 +410,7 @@ export default function HumanResourceForm({
                 </div>
 
                 {/* PenName */}
-                <div className="flex flex-col gap-y-2 col-span-4 lg:col-span-">
+                {/* <div className="flex flex-col gap-y-2 col-span-4 lg:col-span-">
                   <Label>Danh xưng</Label>
                   <Select
                     defaultValue={departmentRolesPenName?.penName || HUMAN_RESOURCE_PEN_NAME_OPTIONS[0].value}
@@ -424,7 +429,7 @@ export default function HumanResourceForm({
                       </SelectGroup>
                     </SelectContent>
                   </Select>
-                </div>
+                </div> */}
 
                 {index !== 0 && (
                   <Button className="" variant={'destructive'} onClick={() => removeDepartmentRole(index)}>

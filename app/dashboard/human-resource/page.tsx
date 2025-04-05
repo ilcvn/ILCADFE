@@ -170,7 +170,7 @@ function HumanResourcePage() {
         return (
           <div className="flex flex-wrap w-36 gap-2">
             {penNames.map((penName, index) => {
-              const penNameLabel = HUMAN_RESOURCE_PEN_NAME_LABEL[penName as HumanResourcePenName];
+              const penNameLabel = penName;
               return (
                 <div key={index} className="flex items-center">
                   <span>{penNameLabel}</span>

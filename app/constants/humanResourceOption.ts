@@ -13,6 +13,8 @@ export const HUMAN_RESOURCE_OPTIONS = [
 
 export const HUMAN_RESOURCE_PEN_NAME_OPTIONS = [
   { value: 'NA', label: '----' },
+  { value: 'EXPERT', label: 'Chuyên Gia' },
+  { value: 'JOURNALIST', label: 'Nhà Báo' },
   { value: 'BACHELOR', label: 'Cử Nhân' },
   { value: 'BACHELOR_OF_LAW', label: 'Cử Nhân Luật' },
   { value: 'BACHELOR_OF_ACCOUNTING', label: 'Cử Nhân Kế Toán' },

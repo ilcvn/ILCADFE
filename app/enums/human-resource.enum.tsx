@@ -39,6 +39,8 @@ export const HUMAN_RESOURCE_ROLE_STYLES: Record<HumanResourceRole, string> = {
 
 export enum HumanResourcePenName {
   NA = 'NA',
+  EXPERT = 'EXPERT',
+  JOURNALIST = 'JOURNALIST',
   BACHELOR = 'BACHELOR',
   BACHELOR_OF_ECONOMICS_AND_LAW = 'BACHELOR_OF_ECONOMICS_AND_LAW',
   BACHELOR_OF_ACCOUNTING = 'BACHELOR_OF_ACCOUNTING',
@@ -58,11 +60,13 @@ export enum HumanResourcePenName {
 
 export const HUMAN_RESOURCE_PEN_NAME_LABEL: Record<HumanResourcePenName, string> = {
   [HumanResourcePenName.NA]: 'Chưa xác định',
+  [HumanResourcePenName.EXPERT]: 'Chuyên Gia',
+  [HumanResourcePenName.JOURNALIST]: 'Nhà Báo',
   [HumanResourcePenName.BACHELOR]: 'Cử Nhân',
   [HumanResourcePenName.BACHELOR_OF_LAW]: 'Cử Nhân Luật',
   [HumanResourcePenName.BACHELOR_OF_ACCOUNTING]: 'Cử Nhân Kế Toán',
   [HumanResourcePenName.BACHELOR_OF_ECONOMICS_AND_LAW]: 'Cử Nhân Kinh Tế Luật',
-  [HumanResourcePenName.BACHELOR_OF_INTERNATIONAL_ECONOMICS]: 'Cử Nhân Kinh Tế Đối NgoạiNgoại',
+  [HumanResourcePenName.BACHELOR_OF_INTERNATIONAL_ECONOMICS]: 'Cử Nhân Kinh Tế Đối Ngoại',
   [HumanResourcePenName.BACHELOR_OF_FINANCE_AND_BANKING]: 'Cử Nhân Tài Chính Ngân Hàng',
   [HumanResourcePenName.BACHELOR_OF_FINANCE_AND_ACCOUNTING]: 'Cử Nhân Tài Chính Kế Toán',
   [HumanResourcePenName.BACHELOR_OF_BUSINESS_ADMINISTRATION]: 'Cử Nhân Quản Trị Kinh Doanh',
