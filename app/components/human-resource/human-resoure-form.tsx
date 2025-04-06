@@ -357,7 +357,9 @@ export default function HumanResourceForm({
             {/* PenName */}
             <div className="flex flex-col gap-y-2 col-span-4 lg:col-span-4">
               <Label>Danh Xưng</Label>
-              <Input id="penName" placeholder="Luật Sư, Tiến Sĩ, Nguyên Thẩm Phán" {...register('penName')} />
+              <Input id="penName" placeholder="Luật Sư, Tiến Sĩ, Nguyên Thẩm Phán" {...register('penName')} 
+              onChange={(e) => e.target.value = e.target.value.toUpperCase()}/>
+              
               {errors.penName && <p className="text-red-500 text-sm">{errors.penName.message}</p>}
             </div>
             
