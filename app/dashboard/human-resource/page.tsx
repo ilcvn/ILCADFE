@@ -227,7 +227,7 @@ function HumanResourcePage() {
                   <Badge variant="outline" className={cn('flex items-center px-2 py-1 rounded-md w-max', roleStyle)}>
                     {roleLabel}
                   </Badge>
-                  {index < roles.length - 1 && <Link2 className="w-4 h-4 ml-1 text-gray-400" />}
+                  {/* {index < roles.length - 1 && <Link2 className="w-4 h-4 ml-1 text-gray-400" />} */}
                 </div>
               );
             })}
