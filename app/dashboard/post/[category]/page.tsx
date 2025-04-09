@@ -28,7 +28,7 @@ const PostPage = () => {
   const params = useParams();
   const navigation = useRouter();
 
-  const validCategories = ['about', 'service', 'news', 'knowledge'];
+  const validCategories = ['training', 'service', 'news', 'research'];
 
   if (!validCategories.includes(params?.category as string)) {
     notFound();
@@ -70,8 +70,8 @@ const PostPage = () => {
 
   const toCreatePost = () => {
     switch (params?.category) {
-      case 'about':
-        navigation.push(`/dashboard/generate-post/about`);
+      case 'training':
+        navigation.push(`/dashboard/generate-post/training`);
         break;
       case 'service':
         navigation.push(`/dashboard/generate-post/service`);
@@ -79,8 +79,8 @@ const PostPage = () => {
       case 'news':
         navigation.push(`/dashboard/generate-post/news`);
         break;
-      case 'knowledge':
-        navigation.push(`/dashboard/generate-post/knowledge`);
+      case 'research':
+        navigation.push(`/dashboard/generate-post/research`);
         break;
 
       default:
@@ -124,7 +124,7 @@ const PostPage = () => {
     {
       accessorKey: 'title',
       header: 'TIÊU ĐỀ',
-      cell: ({ row }) => <span className="font-bold text-md text-orange-600">{row.getValue('title')}</span>,
+      cell: ({ row }) => <span className="font-bold text-md text-primary">{row.getValue('title')}</span>,
     },
     {
       accessorKey: 'type',

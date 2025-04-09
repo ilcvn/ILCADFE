@@ -1,4 +1,5 @@
 export const ECOSYSTEM_OPTIONS = [
-  { value: 'MEDIA', label: 'Truyền Thông' },
-  { value: 'STRATEGY', label: 'Chiến Lược' },
+  { value: 'ENTERPRISE', label: 'Đối Tác Doanh Nghiệp' },
+  { value: 'EDUCATIONAL_INSTITUTION', label: 'Đối Tác Giáo Dục' },
+  { value: 'ORGANIZATION', label: 'Cơ Quan Đối Tác' },
 ];

@@ -131,7 +131,7 @@ function StatisticPage() {
     },
     {
       accessorKey: 'quantityKnowledge',
-      header: 'SỐ LƯỢNG KIẾN THỨC',
+      header: 'SỐ LƯỢNG NGHIÊN CỨU KHOA HỌC',
       cell: ({ row }) => {
         const quantity = row.getValue('quantityKnowledge') as string;
         return <span className="">{quantity}</span>;
@@ -160,9 +160,7 @@ function StatisticPage() {
         return {
           title: 'Biểu đồ Lượt liên hệ tư vấn',
           data: viewConsultingContacts,
-          lines: [
-            { key: 'quantityConsult', color: '#4169E1', label: 'Tư vấn' },
-          ],
+          lines: [{ key: 'quantityConsult', color: '#4169E1', label: 'Tư vấn' }],
         };
 
       case 'VIEW_MEMBER':
@@ -178,7 +176,7 @@ function StatisticPage() {
           data: viewArticles,
           lines: [
             { key: 'quantityNews', color: '#4169E1', label: 'Tin tức' },
-            { key: 'quantityKnowledge', color: '#82ca9d', label: 'Kiến thức' },
+            { key: 'quantityKnowledge', color: '#82ca9d', label: 'Đào Tạo' },
             { key: 'quantityService', color: '#ff7300', label: 'Dịch vụ' },
           ],
         };
@@ -252,7 +250,7 @@ function StatisticPage() {
   const columnsViewArticleExcel = [
     { header: 'Tháng', key: 'dateName', width: 15 },
     { header: 'Số Lượng Tin Tức', key: 'quantityNews', width: 20 },
-    { header: 'Số Lượng Kiến Thức', key: 'quantityKnowledge', width: 20 },
+    { header: 'Số Lượng Đào Tạo', key: 'quantityKnowledge', width: 20 },
     { header: 'Số Lượng Dịch Vụ', key: 'quantityService', width: 20 },
   ];
 

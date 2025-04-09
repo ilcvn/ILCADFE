@@ -33,8 +33,8 @@ export const navLinks: NavLink[] = [
     icon: FileText,
     children: [
       {
-        path: '/dashboard/post/about',
-        label: 'Tổng Quan',
+        path: '/dashboard/post/training',
+        label: 'Đào Tạo',
         isActive: false,
         group: 'management',
       },
@@ -51,8 +51,8 @@ export const navLinks: NavLink[] = [
         group: 'management',
       },
       {
-        path: '/dashboard/post/knowledge',
-        label: 'Kiến Thức',
+        path: '/dashboard/post/research',
+        label: 'Nghiên Cứu Khoa Học',
         isActive: false,
         group: 'management',
       },

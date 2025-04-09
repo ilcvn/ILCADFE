@@ -124,8 +124,8 @@ export default function UserAccountForm({
   };
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogContent className="max-w-[400px] lg:max-w-[500px]">
+    <Dialog open={isDialogOpen}>
+      <DialogContent className="max-w-[400px] lg:max-w-[500px] [&>button]:hidden">
         <DialogHeader>
           <DialogTitle className="text-primary">{mode === 'CREATE' ? 'Tạo người dùng' : 'Cập nhật tài khoản'}</DialogTitle>
           <DialogDescription>
@@ -186,7 +186,14 @@ export default function UserAccountForm({
 
           <DialogFooter className="mt-4">
             <div className="flex items-center gap-2 justify-end">
-              <Button type="button" variant={'outline'} onClick={() => setIsDialogOpen(false)}>
+              <Button
+                type="button"
+                variant={'outline'}
+                onClick={() => {
+                  reset({ name: '', userName: '', password: '' });
+                  setIsDialogOpen(false);
+                }}
+              >
                 Hủy
               </Button>
               <SubmitButton text="Lưu thông tin" variant="default" isPending={isPending} />
