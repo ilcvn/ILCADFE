@@ -52,6 +52,7 @@ export default function EcosystemForm({
         if (request) {
           toast.success('Tạo hệ sinh thái thành công!');
           reset({ fullName: '', linkWebsite: '', imgUrl: '', typeEcosystem: '' });
+          setCurrentEcoSystemImage('');
           setIsDialogOpen(false);
           reloadData?.();
         } else {
@@ -96,14 +97,14 @@ export default function EcosystemForm({
       reset(ecosystem);
     } else {
       setCurrentEcoSystemImage('');
-      reset({ fullName: '', linkWebsite: '', imgUrl: '' });
+      reset({ fullName: '', linkWebsite: '', imgUrl: '', typeEcosystem: '' });
       setValue('typeEcosystem', ECOSYSTEM_OPTIONS[0].value);
     }
   }, [mode, ecosystem, reset]);
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogContent className="max-w-full max-h-[600px] md:max-w-[625px] md:max-h-[500px] lg:max-w-[825px] lg:max-h-full overflow-y-auto">
+    <Dialog open={isDialogOpen}>
+      <DialogContent className="max-w-full max-h-[600px] md:max-w-[625px] md:max-h-[500px] lg:max-w-[825px] lg:max-h-full overflow-y-auto [&>button]:hidden">
         <DialogHeader>
           <DialogTitle className="text-primary">{mode === 'CREATE' ? 'Tạo hệ sinh thái' : 'Cập nhật thông tin'}</DialogTitle>
           <DialogDescription>
@@ -206,7 +207,14 @@ export default function EcosystemForm({
 
           <DialogFooter className="mt-4">
             <div className="flex items-center gap-2 justify-end">
-              <Button type="button" variant={'outline'} onClick={() => setIsDialogOpen(false)}>
+              <Button
+                type="button"
+                variant={'outline'}
+                onClick={() => {
+                  reset({ fullName: '', linkWebsite: '', imgUrl: '', typeEcosystem: '' });
+                  setIsDialogOpen(false);
+                }}
+              >
                 Hủy
               </Button>
               <SubmitButton text="Lưu thông tin" variant="default" isPending={isPending || isUploading} />

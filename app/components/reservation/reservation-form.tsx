@@ -228,8 +228,8 @@ export default function ReservationForm({
   };
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogContent className="max-w-full max-h-[700px] md:max-w-[725px] md:max-h-[500px] lg:max-w-[925px] lg:max-h-[800px] overflow-auto">
+    <Dialog open={isDialogOpen}>
+      <DialogContent className="max-w-full max-h-[700px] md:max-w-[725px] md:max-h-[500px] lg:max-w-[925px] lg:max-h-[800px] overflow-auto [&>button]:hidden">
         <DialogHeader>
           <DialogTitle className="text-primary">
             {mode === 'CREATE' ? 'Tạo lịch tư vấn - liên hệ' : 'Thông tin tư vấn - liên hệ'}
@@ -431,7 +431,27 @@ export default function ReservationForm({
 
           <DialogFooter className="mt-4">
             <div className="flex items-center gap-2 justify-end">
-              <Button type="button" variant={'outline'} onClick={() => setIsDialogOpen(false)}>
+              <Button
+                type="button"
+                variant={'outline'}
+                onClick={() => {
+                  reset({
+                    fullName: '',
+                    address: '',
+                    consultDate: '',
+                    content: '',
+                    file: '',
+                    gmail: '',
+                    phone: '',
+                    status: '',
+                    subject: '',
+                    language: '',
+                  });
+                  setSelectedItems([]);
+
+                  setIsDialogOpen(false);
+                }}
+              >
                 Hủy
               </Button>
               <SubmitButton text="Lưu thông tin" variant="default" isPending={isPending || isUploading} />
