@@ -28,9 +28,7 @@ const PostPage = () => {
   const params = useParams();
   const navigation = useRouter();
 
-  // const validCategories = ['about', 'service', 'news', 'knowledge'];
-
-  const validCategories = ['service', 'news'];
+  const validCategories = ['training', 'service', 'news', 'research'];
 
   if (!validCategories.includes(params?.category as string)) {
     notFound();
@@ -72,8 +70,8 @@ const PostPage = () => {
 
   const toCreatePost = () => {
     switch (params?.category) {
-      case 'about':
-        navigation.push(`/dashboard/generate-post/about`);
+      case 'training':
+        navigation.push(`/dashboard/generate-post/training`);
         break;
       case 'service':
         navigation.push(`/dashboard/generate-post/service`);
@@ -81,8 +79,8 @@ const PostPage = () => {
       case 'news':
         navigation.push(`/dashboard/generate-post/news`);
         break;
-      case 'knowledge':
-        navigation.push(`/dashboard/generate-post/knowledge`);
+      case 'research':
+        navigation.push(`/dashboard/generate-post/research`);
         break;
 
       default:

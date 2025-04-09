@@ -299,7 +299,7 @@ export default function HumanResourceForm({
 
   return (
     <Dialog open={isDialogOpen}>
-      <DialogContent className="max-w-[400px] max-h-[600px] md:max-w-[625px] md:max-h-[500px] lg:max-w-[825px] lg:max-h-[900px] overflow-y-auto [&>button]:hidden">
+      <DialogContent className="max-w-[400px] max-h-[600px] md:max-w-[625px] md:max-h-[500px] lg:max-w-[825px] lg:max-h-[800px] overflow-y-auto [&>button]:hidden">
         <DialogHeader>
           <DialogTitle className="text-primary">{mode === 'CREATE' ? 'Tạo nhân sự' : 'Cập nhật thông tin'}</DialogTitle>
           <DialogDescription>

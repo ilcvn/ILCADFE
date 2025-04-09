@@ -32,12 +32,12 @@ export const navLinks: NavLink[] = [
     label: 'Bài Viết',
     icon: FileText,
     children: [
-      // {
-      //   path: '/dashboard/post/about',
-      //   label: 'Tổng Quan',
-      //   isActive: false,
-      //   group: 'management',
-      // },
+      {
+        path: '/dashboard/post/training',
+        label: 'Đào Tạo',
+        isActive: false,
+        group: 'management',
+      },
       {
         path: '/dashboard/post/service',
         label: 'Dịch Vụ',
@@ -50,12 +50,12 @@ export const navLinks: NavLink[] = [
         isActive: false,
         group: 'management',
       },
-      // {
-      //   path: '/dashboard/post/knowledge',
-      //   label: 'Kiến Thức',
-      //   isActive: false,
-      //   group: 'management',
-      // },
+      {
+        path: '/dashboard/post/research',
+        label: 'Nghiên Cứu Khoa Học',
+        isActive: false,
+        group: 'management',
+      },
     ],
     group: 'management',
     isActive: false,

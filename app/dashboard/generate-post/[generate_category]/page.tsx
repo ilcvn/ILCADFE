@@ -35,7 +35,7 @@ function GeneratePostDynamic() {
 
   const [labelType, setLabelType] = useState<String | null>('');
 
-  const validCategories = ['about', 'service', 'news', 'knowledge'];
+  const validCategories = ['training', 'service', 'news', 'research'];
 
   const [isUploading, setIsUploading] = useState(false);
 
