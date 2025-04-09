@@ -81,7 +81,7 @@ function HumanReSourceDetailPage() {
             </div>
           </div>
 
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-start gap-2">
             <span className="font-semibold">Chức vụ:</span>
             {roles.map((role, index) => {
               const roleLabel = HUMAN_RESOURCE_ROLES_LABEL[role as HumanResourceRole] || 'Không xác định';
@@ -92,7 +92,6 @@ function HumanReSourceDetailPage() {
                   <Badge variant="outline" className={cn('flex items-center px-2 py-1 rounded-md w-max', roleStyle)}>
                     {roleLabel}
                   </Badge>
-                  {index < roles.length - 1 && <Link2 className="w-4 h-4 ml-1 text-gray-400" />}
                 </div>
               );
             })}

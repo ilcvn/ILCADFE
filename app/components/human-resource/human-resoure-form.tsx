@@ -106,7 +106,6 @@ export default function HumanResourceForm({
       });
 
       //Điều kiện dừng cho mỗi giá trị
-
       if (de === false) {
         toast.error('Phải chọn ít nhất một phòng ban');
         return;
@@ -135,21 +134,23 @@ export default function HumanResourceForm({
             description: '',
             language: '',
             department: '',
-            //penName: '',
             role: '',
-            departmentRolePenNames: [{ department: '', role: '', /*penName: ''*/ }],
+            departmentRolePenNames: [{ department: '', role: '' /*penName: ''*/ }],
           });
+
           setIsDialogOpen(false);
           reloadData?.();
 
           setDepartmentRolesPenNameListAdd([
-            ...departmentRolesPenNameListAdd,
             {
               department: HUMAN_RESOURCE_DEPARTMENT_OPTIONS[0].value,
               role: HUMAN_RESOURCE_OPTIONS[0].value,
               //penName: HUMAN_RESOURCE_PEN_NAME_OPTIONS[0].value,
             },
           ]);
+
+          setCurrentProfileImage('');
+          setValue('language', LANGUAGE_OPTIONS[0].value);
         } else {
           toast.error('Tạo nhân sự thất bại!');
         }
@@ -167,7 +168,7 @@ export default function HumanResourceForm({
             language: '',
             department: '',
             role: '',
-            departmentRolePenNames: [{ department: '', role: '', /*penName: ''*/ }],
+            departmentRolePenNames: [{ department: '', role: '' /*penName: ''*/ }],
           });
           setIsDialogOpen(false);
           reloadData?.();
@@ -212,7 +213,7 @@ export default function HumanResourceForm({
       //const penNames = humanResource.penName.split(',').map((penName) => penName.trim()) || [];
 
       setDepartmentRolesPenNameListAdd(
-        Array.from({ length: Math.max(departments.length, roles.length, /*penNames.length*/) }, (_, index) => ({
+        Array.from({ length: Math.max(departments.length, roles.length /*penNames.length*/) }, (_, index) => ({
           department: departments[index] || HUMAN_RESOURCE_DEPARTMENT_OPTIONS[0].value,
           role: roles[index] || HUMAN_RESOURCE_OPTIONS[0].value,
           //penName: penNames[index] || HUMAN_RESOURCE_PEN_NAME_OPTIONS[0].value,
@@ -238,7 +239,7 @@ export default function HumanResourceForm({
         penName: '',
         role: '',
         language: '',
-        departmentRolePenNames: [{ department: '', role: '', /*penName: '' */}],
+        departmentRolePenNames: [{ department: '', role: '' /*penName: '' */ }],
       });
 
       setValue('language', LANGUAGE_OPTIONS[0].value);
@@ -297,8 +298,8 @@ export default function HumanResourceForm({
   };
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogContent className="max-w-[400px] max-h-[600px] md:max-w-[625px] md:max-h-[500px] lg:max-w-[825px] lg:max-h-[900px] overflow-y-auto">
+    <Dialog open={isDialogOpen}>
+      <DialogContent className="max-w-[400px] max-h-[600px] md:max-w-[625px] md:max-h-[500px] lg:max-w-[825px] lg:max-h-[900px] overflow-y-auto [&>button]:hidden">
         <DialogHeader>
           <DialogTitle className="text-primary">{mode === 'CREATE' ? 'Tạo nhân sự' : 'Cập nhật thông tin'}</DialogTitle>
           <DialogDescription>
@@ -328,7 +329,6 @@ export default function HumanResourceForm({
               {errors.gmail && <p className="text-red-500 text-sm">{errors.gmail.message}</p>}
             </div>
 
-
             <div className="flex flex-col gap-y-2 col-span-4 lg:col-span-1">
               <Label className="">Ngôn ngữ</Label>
               <Select
@@ -357,12 +357,16 @@ export default function HumanResourceForm({
             {/* PenName */}
             <div className="flex flex-col gap-y-2 col-span-4 lg:col-span-4">
               <Label>Danh Xưng</Label>
-              <Input id="penName" placeholder="Luật Sư, Tiến Sĩ, Nguyên Thẩm Phán" {...register('penName')} 
-              onChange={(e) => e.target.value = e.target.value.toUpperCase()}/>
-              
+              <Input
+                id="penName"
+                placeholder="Luật Sư, Tiến Sĩ, Nguyên Thẩm Phán"
+                {...register('penName')}
+                onChange={(e) => (e.target.value = e.target.value.toUpperCase())}
+              />
+
               {errors.penName && <p className="text-red-500 text-sm">{errors.penName.message}</p>}
             </div>
-            
+
             {departmentRolesPenNameListAdd.map((departmentRolesPenName, index) => (
               <div
                 key={index}
@@ -509,7 +513,22 @@ export default function HumanResourceForm({
 
           <DialogFooter className="mt-4">
             <div className="flex items-center gap-2 justify-end">
-              <Button type="button" variant={'outline'} onClick={() => setIsDialogOpen(false)}>
+              <Button
+                type="button"
+                variant={'outline'}
+                onClick={() => {
+                  reset();
+                  setValue('language', LANGUAGE_OPTIONS[0].value);
+                  setDepartmentRolesPenNameListAdd([
+                    {
+                      department: HUMAN_RESOURCE_DEPARTMENT_OPTIONS[0].value,
+                      role: HUMAN_RESOURCE_OPTIONS[0].value,
+                      //penName: HUMAN_RESOURCE_PEN_NAME_OPTIONS[0].value,
+                    },
+                  ]);
+                  setIsDialogOpen(false);
+                }}
+              >
                 Hủy
               </Button>
               <SubmitButton text="Lưu thông tin" variant="default" isPending={isPending || isUploading} />
