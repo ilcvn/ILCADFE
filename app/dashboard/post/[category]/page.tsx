@@ -28,7 +28,9 @@ const PostPage = () => {
   const params = useParams();
   const navigation = useRouter();
 
-  const validCategories = ['about', 'service', 'news', 'knowledge'];
+  // const validCategories = ['about', 'service', 'news', 'knowledge'];
+
+  const validCategories = ['service', 'news'];
 
   if (!validCategories.includes(params?.category as string)) {
     notFound();
@@ -124,7 +126,7 @@ const PostPage = () => {
     {
       accessorKey: 'title',
       header: 'TIÊU ĐỀ',
-      cell: ({ row }) => <span className="font-bold text-md text-orange-600">{row.getValue('title')}</span>,
+      cell: ({ row }) => <span className="font-bold text-md text-primary">{row.getValue('title')}</span>,
     },
     {
       accessorKey: 'type',

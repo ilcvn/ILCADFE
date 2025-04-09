@@ -164,6 +164,9 @@ export default function ReservationForm({
       setCurrentFileUrl(reservation?.file);
       reset(reservation);
 
+      setValue('status', RESERVATION_STATUS_OPTIONS[0].value);
+      setValue('language', LANGUAGE_OPTIONS[0].value);
+
       if (reservation?.subject) {
         const selectedArray = reservation.subject.split(',').map((item) => Number(item.trim()));
         setSelectedItems(selectedArray);
@@ -356,22 +359,49 @@ export default function ReservationForm({
               {errors.status && <p className="text-red-500 text-sm">{errors.status.message}</p>}
             </div>
 
-            <div className="flex flex-col gap-y-2 col-span-4 lg:col-span-4">
-              <Label>Vấn đề:</Label>
-              {articles.map((article) => (
-                <div key={article.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={article.id}
-                    checked={selectedItems.includes(Number(article.id))}
-                    onCheckedChange={() => handleCheckboxChange(Number(article.id))}
-                  />
-                  <label htmlFor="article.value" className="text-sm font-medium">
-                    {article.title}
-                  </label>
-                </div>
-              ))}
-              {errors.subject && <p className="text-red-500 text-sm">{errors.subject.message}</p>}
-            </div>
+            {mode === 'CREATE' && (
+              <div className="flex flex-col gap-y-2 col-span-4 lg:col-span-4">
+                <Label>Vấn đề:</Label>
+                {articles.map((article) => (
+                  <div key={article.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={article.id}
+                      checked={selectedItems.includes(Number(article.id))}
+                      onCheckedChange={() => handleCheckboxChange(Number(article.id))}
+                    />
+                    <label htmlFor="article.value" className="text-sm font-medium">
+                      {article.title}
+                    </label>
+                  </div>
+                ))}
+                {errors.subject && <p className="text-red-500 text-sm">{errors.subject.message}</p>}
+              </div>
+            )}
+
+            {mode === 'UPDATE' && (
+              <div className="flex flex-col gap-y-2 col-span-4 lg:col-span-4">
+                <Label>Vấn đề:</Label>
+                {selectedItems.length === 0 ? (
+                  <span className="text-sm text-red-500">không có dịch vụ nào được chọn</span>
+                ) : (
+                  articles
+                    .filter((article) => selectedItems.includes(Number(article.id)))
+                    .map((article) => (
+                      <div key={article.id} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={article.id}
+                          checked={true}
+                          onCheckedChange={() => handleCheckboxChange(Number(article.id))}
+                          disabled={mode === 'UPDATE'}
+                        />
+                        <label htmlFor="article.value" className="text-sm font-medium">
+                          {article.title}
+                        </label>
+                      </div>
+                    ))
+                )}
+              </div>
+            )}
 
             {/* Mo Ta */}
             <div className="flex flex-col gap-y-2 col-span-4">
