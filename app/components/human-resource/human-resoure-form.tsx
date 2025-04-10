@@ -319,14 +319,14 @@ export default function HumanResourceForm({
             <div className="flex flex-col gap-y-2 col-span-4 lg:col-span-2">
               <Label>Số điện thoại</Label>
               <Input id="phone" placeholder="Nhập số điện thoại" {...register('phone')} />
-              {errors.phone && <p className="text-red-500 text-sm">{errors.phone.message}</p>}
+              {/* {errors.phone && <p className="text-red-500 text-sm">{errors.phone.message}</p>} */}
             </div>
 
             {/* Email */}
             <div className="flex flex-col gap-y-2 col-span-4 lg:col-span-3">
               <Label>Email</Label>
               <Input id="gmail" placeholder="nguyenvana@gmail.com" {...register('gmail')} />
-              {errors.gmail && <p className="text-red-500 text-sm">{errors.gmail.message}</p>}
+              {/* {errors.gmail && <p className="text-red-500 text-sm">{errors.gmail.message}</p>} */}
             </div>
 
             <div className="flex flex-col gap-y-2 col-span-4 lg:col-span-1">
