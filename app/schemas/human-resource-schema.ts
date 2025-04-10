@@ -4,8 +4,8 @@ import { z } from 'zod';
 export const humanResourceFormSchema = z.object({
   fullName: z.string().min(1, 'Họ và tên là bắt buộc'),
   imgUrl: z.string(),
-  phone: z.string(),
-  gmail: z.string(),
+  phone: z.string().optional(),
+  gmail: z.string().optional(),
   departmentRolePenNames: z.array(
     z.object({
       department: z.string().optional(),

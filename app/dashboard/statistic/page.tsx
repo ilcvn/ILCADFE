@@ -176,7 +176,7 @@ function StatisticPage() {
           data: viewArticles,
           lines: [
             { key: 'quantityNews', color: '#4169E1', label: 'Tin tức' },
-            { key: 'quantityKnowledge', color: '#82ca9d', label: 'Đào Tạo' },
+            { key: 'quantityKnowledge', color: '#82ca9d', label: 'Nghiên Cứu Khoa Học' },
             { key: 'quantityService', color: '#ff7300', label: 'Dịch vụ' },
           ],
         };
@@ -250,7 +250,7 @@ function StatisticPage() {
   const columnsViewArticleExcel = [
     { header: 'Tháng', key: 'dateName', width: 15 },
     { header: 'Số Lượng Tin Tức', key: 'quantityNews', width: 20 },
-    { header: 'Số Lượng Đào Tạo', key: 'quantityKnowledge', width: 20 },
+    { header: 'Số Lượng Nghiên Cứu Khoa Học', key: 'quantityKnowledge', width: 20 },
     { header: 'Số Lượng Dịch Vụ', key: 'quantityService', width: 20 },
   ];
 
