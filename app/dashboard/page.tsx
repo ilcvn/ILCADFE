@@ -367,7 +367,7 @@ const Page = () => {
                             <DropdownMenuGroup>
                               {
                                 <DropdownMenuItem asChild>
-                                  <Link href={`/dashboard/consulting-schedule/consultation`}>
+                                  <Link href={`/dashboard/consulting-consultation-contact`}>
                                     <ExternalLinkIcon className="mr-2 size-4" />
                                     Tư vấn ngay
                                   </Link>
