@@ -47,7 +47,7 @@ function HumanReSourceDetailPage() {
 
   return (
     <div className="p-8 max-w-4xl mx-auto bg-white rounded-lg shadow-lg border-dashed border-2 border-primary">
-      <div className="flex items-start">
+      <div className="flex flex-col items-center gap-4 lg:flex-row lg:items-start">
         <Avatar className="w-48 h-48 border-4 border-primary p-[2px] shadow-lg">
           <AvatarImage src={humanResource?.imgUrl} alt={humanResource?.fullName} className="rounded-full" />
           <AvatarFallback>{humanResource?.fullName[0]}</AvatarFallback>
@@ -56,7 +56,7 @@ function HumanReSourceDetailPage() {
         <div className="ml-6">
           <h1 className="text-3xl font-semibold text-blue-600">{humanResource?.fullName}</h1>
 
-          <p className="text-gray-500 mt-2">
+          <p className="text-gray-500 mt-2 whitespace-pre-line">
             {isExpanded || !shouldTruncate ? description : `${description.slice(0, MAX_LENGTH)}...`}
           </p>
 
