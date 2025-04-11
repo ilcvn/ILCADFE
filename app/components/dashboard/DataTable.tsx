@@ -2,7 +2,7 @@ import { ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, useReact
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Ban, Loader2 } from 'lucide-react';
+import { Ban, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -34,6 +34,48 @@ export function DataTable<TData, TValue>({
   });
 
   const totalPages = Math.ceil(total / limit);
+
+  const renderPaginationButtons = () => {
+    const pages = [];
+    const maxVisiblePages = 4;
+
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      const left = Math.max(2, page - 1);
+      const right = Math.min(totalPages - 1, page + 1);
+
+      pages.push(1);
+
+      if (left > 2) {
+        pages.push('...');
+      }
+
+      for (let i = left; i <= right; i++) {
+        pages.push(i);
+      }
+
+      if (right < totalPages - 1) {
+        pages.push('...');
+      }
+
+      pages.push(totalPages);
+    }
+
+    return pages.map((p, idx) =>
+      p === '...' ? (
+        <span key={`dots-${idx}`} className="px-2 text-muted-foreground">
+          ...
+        </span>
+      ) : (
+        <Button key={p} variant={page === p ? 'default' : 'outline'} size="sm" onClick={() => onPageChange(p as number)}>
+          {p}
+        </Button>
+      ),
+    );
+  };
 
   return (
     <>
@@ -91,7 +133,7 @@ export function DataTable<TData, TValue>({
 
           <div className="flex space-x-2">
             <Select value={limit.toString()} onValueChange={(value) => onLimitChange(Number(value))}>
-              <SelectTrigger className="h-8 w-[70px]">
+              <SelectTrigger className="h-9 w-[70px]">
                 <SelectValue placeholder={limit.toString()} />
               </SelectTrigger>
               <SelectContent>
@@ -104,17 +146,19 @@ export function DataTable<TData, TValue>({
             </Select>
 
             <Button variant="outline" size="sm" onClick={() => onPageChange(page - 1)} disabled={page <= 1}>
-              Trước
+              <ChevronLeft className="h-4 w-4" />
             </Button>
 
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
+            {/* {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
               <Button key={num} variant={page === num ? 'default' : 'outline'} size="sm" onClick={() => onPageChange(num)}>
                 {num}
               </Button>
-            ))}
+            ))} */}
+
+            {renderPaginationButtons()}
 
             <Button variant="outline" size="sm" onClick={() => onPageChange(page + 1)} disabled={page >= totalPages}>
-              Trang kế
+              <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
         </div>
