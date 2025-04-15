@@ -120,3 +120,17 @@ export const getAllHumanResourceStatisticByYear = async (year: number): Promise<
     throw new Error(errorMessage);
   }
 };
+
+export const translate = async (id: number, language: string): Promise<Boolean> => {
+  try {
+    const response = await instance.post(`member/translate/${id}/${language}`);
+    if (response.data?.statusCode === 200 && response.data?.data) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error: any) {
+    const errorMessage = error.response?.data?.message;
+    throw new Error(errorMessage);
+  }
+};

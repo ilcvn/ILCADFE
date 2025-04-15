@@ -8,12 +8,11 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
-  ArrowRight,
   Edit,
   EllipsisVertical,
   EyeIcon,
   IdCard,
-  Link2,
+  Languages,
   Mail,
   PhoneCall,
   PlusCircle,
@@ -24,15 +23,9 @@ import { useEffect, useState } from 'react';
 import HumanResourceForm from '../../components/human-resource/human-resoure-form';
 import type HumanResource from '@/app/models/features/human-resource';
 import withAuth from '@/app/components/withAuth';
-import { deleteHumanResourceById, getHumanResource, updateHumanResourceById } from '@/app/api/human-resource';
+import { deleteHumanResourceById, getHumanResource, translate, updateHumanResourceById } from '@/app/api/human-resource';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  HUMAN_RESOURCE_PEN_NAME_LABEL,
-  HUMAN_RESOURCE_ROLE_STYLES,
-  HUMAN_RESOURCE_ROLES_LABEL,
-  type HumanResourcePenName,
-  type HumanResourceRole,
-} from '@/app/enums/human-resource.enum';
+import { HUMAN_RESOURCE_ROLE_STYLES, HUMAN_RESOURCE_ROLES_LABEL, type HumanResourceRole } from '@/app/enums/human-resource.enum';
 import { cn } from '@/lib/utils';
 import { HUMAN_RESOURCE_OPTIONS } from '@/app/constants/humanResourceOption';
 import { toast } from 'sonner';
@@ -100,16 +93,19 @@ function HumanResourcePage() {
   };
 
   const handleDelete = async (resource: HumanResource) => {
+    setIsLoading(true);
     try {
       const request = await deleteHumanResourceById(resource.id);
       if (request) {
         if (resource?.imgUrl) await deletefileDataUploadthing(resource?.imgUrl);
         toast.success('Đã xóa nhân sự thành công');
         fetchHumanResource();
-      } else {
-        toast.error('Xóa nhân sự thất bại');
       }
-    } catch (error) {}
+    } catch (error: any) {
+      toast.error(error?.message || 'Mất kết nối với máy chủ, vui lòng đợi phản hồi');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCreate = () => {
@@ -139,6 +135,21 @@ function HumanResourcePage() {
       }
     } catch (error: any) {
       toast.error(error?.message || 'Có lỗi xảy ra');
+    }
+  };
+
+  const handleTranslation = async (id: number, language: string) => {
+    setIsLoading(true);
+    try {
+      const request = await translate(id, language);
+      if (request) {
+        toast.success('Tạo bản sao thành công');
+        fetchHumanResource();
+      }
+    } catch (error: any) {
+      toast.error(error?.message || 'Có lỗi xảy ra');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -290,6 +301,21 @@ function HumanResourcePage() {
                   </DropdownMenuItem>
                 )}
 
+                {/* Tạo bản sao */}
+                {languageFilter === LANGUAGE_OPTIONS[0].value && (
+                  <DropdownMenuItem onClick={() => handleTranslation(Number(resource?.id), LANGUAGE_OPTIONS[1].value)}>
+                    <Languages />
+                    Tạo bản sao tiếng anh
+                  </DropdownMenuItem>
+                )}
+
+                {languageFilter === LANGUAGE_OPTIONS[0].value && (
+                  <DropdownMenuItem onClick={() => handleTranslation(Number(resource?.id), LANGUAGE_OPTIONS[2].value)}>
+                    <Languages />
+                    Tạo bản sao tiếng trung
+                  </DropdownMenuItem>
+                )}
+
                 {/* Chỉ GLOBAL_ADMIN mới có quyền xóa */}
                 {role === UserRole.GLOBAL_ADMIN && (
                   <DropdownMenuItem onClick={() => handleDelete(resource)}>
@@ -364,7 +390,7 @@ function HumanResourcePage() {
               setSearchValue('');
               setRoleFilter('');
               setIsShowFilter('');
-              setLanguageFilter('');
+              setLanguageFilter(LANGUAGE_OPTIONS[0].value);
               setPage(1);
             }}
           >

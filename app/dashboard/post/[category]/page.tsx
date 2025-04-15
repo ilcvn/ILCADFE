@@ -1,6 +1,6 @@
 'use client';
 
-import { deleteArticleById, getArticles } from '@/app/api/article';
+import { deleteArticleById, getArticles, translate } from '@/app/api/article';
 import { DataTable } from '@/app/components/dashboard/DataTable';
 import HeaderContent from '@/app/components/dashboard/HeaderContent';
 import withAuth from '@/app/components/withAuth';
@@ -14,7 +14,7 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import type { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
-import { Edit, EllipsisVertical, EyeIcon, PlusCircle, RotateCcwIcon, Trash } from 'lucide-react';
+import { Edit, EllipsisVertical, EyeIcon, Languages, PlusCircle, RotateCcwIcon, Trash } from 'lucide-react';
 import Image from 'next/image';
 import { notFound, useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -23,6 +23,8 @@ import { Button } from '@/components/ui/button';
 import { deletefileDataUploadthing } from '@/app/api/deleteImageUT';
 import { useApp } from '@/app/context/AppContext';
 import { UserRole } from '@/app/enums/user-account';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { LANGUAGE_OPTIONS } from '@/app/constants/languageOptions';
 
 const PostPage = () => {
   const params = useParams();
@@ -36,6 +38,7 @@ const PostPage = () => {
 
   const [searchValue, setSearchValue] = useState<string>('');
   const [typeFilter, setTypeFilter] = useState(params?.category?.toString().toUpperCase());
+  const [languageFilter, setLanguageFilter] = useState<string>(LANGUAGE_OPTIONS[0].value);
   const [articles, setArticles] = useState<Article[]>([]);
   const [reLoadData, setReLoadData] = useState<boolean>(false);
   const [page, setPage] = useState(1);
@@ -52,6 +55,7 @@ const PostPage = () => {
       const response = await getArticles(page, limit, total, {
         search: searchValue,
         type: typeFilter,
+        language: languageFilter,
       });
 
       setArticles(response.articles);
@@ -66,7 +70,7 @@ const PostPage = () => {
 
   useEffect(() => {
     fetchArticle();
-  }, [page, limit, searchValue, typeFilter, reLoadData]);
+  }, [page, limit, searchValue, typeFilter, languageFilter, reLoadData]);
 
   const toCreatePost = () => {
     switch (params?.category) {
@@ -91,6 +95,7 @@ const PostPage = () => {
   };
 
   const handleDelete = async (resource: Article) => {
+    setIsLoading(true);
     try {
       const request = await deleteArticleById(resource.id);
       if (request) {
@@ -102,6 +107,23 @@ const PostPage = () => {
       }
     } catch (error: any) {
       toast.error(error?.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleTranslation = async (id: number, language: string) => {
+    setIsLoading(true);
+    try {
+      const request = await translate(id, language);
+      if (request) {
+        toast.success('Tạo bản sao thành công');
+        fetchArticle();
+      }
+    } catch (error: any) {
+      toast.error(error?.message || 'Có lỗi xảy ra');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -190,6 +212,22 @@ const PostPage = () => {
                   <EyeIcon />
                   Xem chi tiết
                 </DropdownMenuItem>
+
+                {/* Tạo bản sao */}
+                {languageFilter === LANGUAGE_OPTIONS[0].value && (
+                  <DropdownMenuItem onClick={() => handleTranslation(Number(article?.id), LANGUAGE_OPTIONS[1].value)}>
+                    <Languages />
+                    Tạo bản sao tiếng anh
+                  </DropdownMenuItem>
+                )}
+
+                {languageFilter === LANGUAGE_OPTIONS[0].value && (
+                  <DropdownMenuItem onClick={() => handleTranslation(Number(article?.id), LANGUAGE_OPTIONS[2].value)}>
+                    <Languages />
+                    Tạo bản sao tiếng trung
+                  </DropdownMenuItem>
+                )}
+
                 {role === UserRole.GLOBAL_ADMIN && (
                   <DropdownMenuItem onClick={() => handleDelete(article)}>
                     <div className="text-red-500 flex items-center gap-2">
@@ -225,12 +263,33 @@ const PostPage = () => {
             onClick={() => {
               setSearchValue('');
               setPage(1);
+              setLanguageFilter(LANGUAGE_OPTIONS[0].value);
             }}
           >
             <RotateCcwIcon className="w-6 h-6" />
           </Button>
 
-          <div className="ml-auto">
+          <div className="flex items-center gap-2 ml-auto">
+            <Select
+              value={languageFilter}
+              onValueChange={(value) => {
+                setLanguageFilter(value);
+              }}
+            >
+              <SelectTrigger className="w-full md:w-[180px]">
+                <SelectValue placeholder="Lọc theo ngôn ngữ" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {LANGUAGE_OPTIONS.map((language) => (
+                    <SelectItem key={language.value} value={language.value}>
+                      {language.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+
             {role === UserRole.GLOBAL_ADMIN && (
               <Button variant="default" className="w-full sm:w-auto" onClick={toCreatePost}>
                 <PlusCircle className="w-6 h-6" />

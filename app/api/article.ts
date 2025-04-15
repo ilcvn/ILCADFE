@@ -6,6 +6,7 @@ import type { ViewArticle } from '../models/features/viewArticle';
 interface FilterParams {
   search?: string;
   type?: string;
+  language?: string;
 }
 
 export const getArticles = async (
@@ -22,6 +23,7 @@ export const getArticles = async (
         total,
         search: filters.search,
         type: filters.type,
+        language: filters.language,
       },
     });
 
@@ -136,6 +138,20 @@ export const getAllArticleStatisticByYear = async (year: number): Promise<ViewAr
       return response.data?.data;
     } else {
       throw new Error('Failed to fetch view article');
+    }
+  } catch (error: any) {
+    const errorMessage = error.response?.data?.message;
+    throw new Error(errorMessage);
+  }
+};
+
+export const translate = async (id: number, language: string): Promise<Boolean> => {
+  try {
+    const response = await instance.post(`article/translate/${id}/${language}`);
+    if (response.data?.statusCode === 200 && response.data?.data) {
+      return true;
+    } else {
+      return false;
     }
   } catch (error: any) {
     const errorMessage = error.response?.data?.message;
