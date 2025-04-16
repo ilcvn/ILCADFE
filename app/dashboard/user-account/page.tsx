@@ -20,6 +20,8 @@ import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { useApp } from '@/app/context/AppContext';
+import { LoadingOverlay } from '@/app/components/LoadingOverlay';
+import { useActionWithLoading } from '@/app/hooks/useActionWithLoading';
 
 type btnActions = 'CREATE' | 'UPDATE' | 'SEE' | 'PRINT' | 'NULL';
 
@@ -40,6 +42,8 @@ function UserAccountPage() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
   const { role } = useApp();
+
+  const { isLoadingAction, execute } = useActionWithLoading();
 
   useEffect(() => {
     fetchUsers();
@@ -67,17 +71,15 @@ function UserAccountPage() {
   };
 
   const handleDelete = async (resource: Account) => {
-    try {
-      const request = await deleteUserById(resource.id);
-      if (request) {
-        toast.success('Đã xóa người dùng thành công');
-        fetchUsers();
-      } else {
-        toast.error('Xóa người dùng thất bại');
-      }
-    } catch (error: any) {
-      toast.error(error?.message);
-    }
+    execute(
+      async () => {
+        const request = await deleteUserById(resource.id);
+        if (request) {
+          await fetchUsers();
+        }
+      },
+      { successMessage: 'Đã xóa người dùng thành công', errorMessage: 'Xóa người dùng thất bại' },
+    );
   };
 
   const handleCreate = () => {
@@ -145,6 +147,8 @@ function UserAccountPage() {
 
   return (
     <div>
+      <LoadingOverlay visible={isLoadingAction} />
+
       <HeaderContent title="Người dùng" subTitle="Quản lý tài khoản người dùng" />
 
       <Card className="px-4 py-2 shadow-md">

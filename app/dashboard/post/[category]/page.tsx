@@ -25,6 +25,8 @@ import { useApp } from '@/app/context/AppContext';
 import { UserRole } from '@/app/enums/user-account';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { LANGUAGE_OPTIONS } from '@/app/constants/languageOptions';
+import { LoadingOverlay } from '@/app/components/LoadingOverlay';
+import { useActionWithLoading } from '@/app/hooks/useActionWithLoading';
 
 const PostPage = () => {
   const params = useParams();
@@ -48,6 +50,8 @@ const PostPage = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { role } = useApp();
+
+  const { isLoadingAction, execute } = useActionWithLoading();
 
   const fetchArticle = async () => {
     setIsLoading(true);
@@ -95,36 +99,28 @@ const PostPage = () => {
   };
 
   const handleDelete = async (resource: Article) => {
-    setIsLoading(true);
-    try {
-      const request = await deleteArticleById(resource.id);
-      if (request) {
-        if (resource?.preview_img) await deletefileDataUploadthing(resource?.preview_img);
-        toast.success('Đã xóa bài báo thành công');
-        fetchArticle();
-      } else {
-        toast.error('Xóa bài báo thất bại');
-      }
-    } catch (error: any) {
-      toast.error(error?.message);
-    } finally {
-      setIsLoading(false);
-    }
+    execute(
+      async () => {
+        const request = await deleteArticleById(resource.id);
+        if (request) {
+          if (resource?.preview_img) await deletefileDataUploadthing(resource?.preview_img);
+          await fetchArticle();
+        }
+      },
+      { successMessage: 'Đã xóa bài báo thành công', errorMessage: 'Xóa bài báo thất bại' },
+    );
   };
 
   const handleTranslation = async (id: number, language: string) => {
-    setIsLoading(true);
-    try {
-      const request = await translate(id, language);
-      if (request) {
-        toast.success('Tạo bản sao thành công');
-        fetchArticle();
-      }
-    } catch (error: any) {
-      toast.error(error?.message || 'Có lỗi xảy ra');
-    } finally {
-      setIsLoading(false);
-    }
+    execute(
+      async () => {
+        const request = await translate(id, language);
+        if (request) {
+          await fetchArticle();
+        }
+      },
+      { successMessage: 'Tạo bản sao thành công', errorMessage: 'Tạo bản sao thất bại' },
+    );
   };
 
   const columns: ColumnDef<Article>[] = [
@@ -246,6 +242,8 @@ const PostPage = () => {
 
   return (
     <div className="">
+      <LoadingOverlay visible={isLoadingAction} />
+
       <HeaderContent title="Bài Báo" subTitle="Quản lý thông tin bài báo" />
 
       <Card className="px-4 py-2 shadow-md">

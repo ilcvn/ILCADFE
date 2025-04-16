@@ -39,6 +39,8 @@ import { deletefileDataUploadthing } from '@/app/api/deleteImageUT';
 import { useApp } from '@/app/context/AppContext';
 import { UserRole } from '@/app/enums/user-account';
 import { LANGUAGE_OPTIONS } from '@/app/constants/languageOptions';
+import { useActionWithLoading } from '@/app/hooks/useActionWithLoading';
+import { LoadingOverlay } from '@/app/components/LoadingOverlay';
 
 type btnActions = 'CREATE' | 'UPDATE' | 'SEE' | 'PRINT' | 'NULL';
 
@@ -60,6 +62,8 @@ function HumanResourcePage() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
   const { role } = useApp();
+
+  const { isLoadingAction, execute } = useActionWithLoading();
 
   const navigation = useRouter();
 
@@ -93,19 +97,19 @@ function HumanResourcePage() {
   };
 
   const handleDelete = async (resource: HumanResource) => {
-    setIsLoading(true);
-    try {
-      const request = await deleteHumanResourceById(resource.id);
-      if (request) {
-        if (resource?.imgUrl) await deletefileDataUploadthing(resource?.imgUrl);
-        toast.success('Đã xóa nhân sự thành công');
-        fetchHumanResource();
-      }
-    } catch (error: any) {
-      toast.error(error?.message || 'Mất kết nối với máy chủ, vui lòng đợi phản hồi');
-    } finally {
-      setIsLoading(false);
-    }
+    execute(
+      async () => {
+        const request = await deleteHumanResourceById(resource.id);
+        if (request) {
+          if (resource?.imgUrl) await deletefileDataUploadthing(resource?.imgUrl);
+          await fetchHumanResource();
+        }
+      },
+      {
+        successMessage: 'Đã xóa nhân sự thành công',
+        errorMessage: 'Đã xóa nhân sự thất bại',
+      },
+    );
   };
 
   const handleCreate = () => {
@@ -115,42 +119,43 @@ function HumanResourcePage() {
   };
 
   const handleToggleShow = async (resource: HumanResource, checked: boolean) => {
-    try {
-      resource.isShow = checked;
-      const requestBody = {
-        fullName: resource?.fullName,
-        description: resource?.description,
-        gmail: resource?.gmail,
-        imgUrl: resource?.imgUrl,
-        phone: resource?.phone,
-        role: resource?.role,
-        isShow: resource?.isShow,
-      };
-      const request = await updateHumanResourceById(requestBody, resource.id);
-      if (request) {
-        toast.success('Cập nhật trạng thái hiển thị thành công');
-        fetchHumanResource();
-      } else {
-        toast.error('Cập nhật trạng thái hiển thị thất bại');
-      }
-    } catch (error: any) {
-      toast.error(error?.message || 'Có lỗi xảy ra');
-    }
+    execute(
+      async () => {
+        resource.isShow = checked;
+        const requestBody = {
+          fullName: resource?.fullName,
+          description: resource?.description,
+          gmail: resource?.gmail,
+          imgUrl: resource?.imgUrl,
+          phone: resource?.phone,
+          role: resource?.role,
+          isShow: resource?.isShow,
+        };
+        const request = await updateHumanResourceById(requestBody, resource.id);
+        if (request) {
+          await fetchHumanResource();
+        }
+      },
+      {
+        successMessage: 'Cập nhật trạng thái thành công!',
+        errorMessage: 'Cập nhật trạng thái thất bại!',
+      },
+    );
   };
 
-  const handleTranslation = async (id: number, language: string) => {
-    setIsLoading(true);
-    try {
-      const request = await translate(id, language);
-      if (request) {
-        toast.success('Tạo bản sao thành công');
-        fetchHumanResource();
-      }
-    } catch (error: any) {
-      toast.error(error?.message || 'Có lỗi xảy ra');
-    } finally {
-      setIsLoading(false);
-    }
+  const handleTranslation = (id: number, language: string) => {
+    execute(
+      async () => {
+        const request = await translate(id, language);
+        if (request) {
+          await fetchHumanResource();
+        }
+      },
+      {
+        successMessage: 'Tạo bản sao thành công!',
+        errorMessage: 'Tạo bản sao thất bại!',
+      },
+    );
   };
 
   // Colunm Table
@@ -335,6 +340,8 @@ function HumanResourcePage() {
 
   return (
     <div className="">
+      <LoadingOverlay visible={isLoadingAction} />
+
       <HeaderContent title="Nhân Sự" subTitle="Quản lý thông tin nhân sự" />
 
       <Card className="px-4 py-2 shadow-md">
