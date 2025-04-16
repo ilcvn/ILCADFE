@@ -147,7 +147,6 @@ export const getAllArticleStatisticByYear = async (year: number): Promise<ViewAr
 
 export const translate = async (id: number, fromLanguage: string, toLanguage: string): Promise<Boolean> => {
   try {
-    console.log(`article/translate/${id}/${fromLanguage}/${toLanguage}`);
     const response = await instance.post(`article/translate/${id}/${fromLanguage}/${toLanguage}`);
     if (response.data?.statusCode === 200 && response.data?.data) {
       return true;

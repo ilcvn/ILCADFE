@@ -109,7 +109,11 @@ const PostPage = () => {
       async () => {
         const request = await deleteArticleById(resource.id);
         if (request) {
-          if (resource?.preview_img) await deletefileDataUploadthing(resource?.preview_img);
+          if (resource?.preview_img) {
+            if (resource.language === LANGUAGE_OPTIONS[0].value) {
+              await deletefileDataUploadthing(resource?.preview_img);
+            }
+          }
           await fetchArticle();
         }
       },
@@ -216,15 +220,23 @@ const PostPage = () => {
                 </DropdownMenuItem>
 
                 {/* Tạo bản sao */}
-                {<DropdownMenuItem onClick={() => handleTranslation(Number(article?.id), languageFilter, translateDictionary[languageFilter][0])}>
-                  <Languages />
-                  {translateDictionary[languageFilter][1]}
-                </DropdownMenuItem>}
+                {
+                  <DropdownMenuItem
+                    onClick={() => handleTranslation(Number(article?.id), languageFilter, translateDictionary[languageFilter][0])}
+                  >
+                    <Languages />
+                    {translateDictionary[languageFilter][1]}
+                  </DropdownMenuItem>
+                }
 
-                {<DropdownMenuItem onClick={() => handleTranslation(Number(article?.id), languageFilter, translateDictionary[languageFilter][2])}>
+                {
+                  <DropdownMenuItem
+                    onClick={() => handleTranslation(Number(article?.id), languageFilter, translateDictionary[languageFilter][2])}
+                  >
                     <Languages />
                     {translateDictionary[languageFilter][3]}
-                  </DropdownMenuItem>}
+                  </DropdownMenuItem>
+                }
 
                 {role === UserRole.GLOBAL_ADMIN && (
                   <DropdownMenuItem onClick={() => handleDelete(article)}>

@@ -107,7 +107,12 @@ function HumanResourcePage() {
       async () => {
         const request = await deleteHumanResourceById(resource.id);
         if (request) {
-          if (resource?.imgUrl) await deletefileDataUploadthing(resource?.imgUrl);
+          if (resource?.imgUrl) {
+            if (resource.language === LANGUAGE_OPTIONS[0].value) {
+              await deletefileDataUploadthing(resource?.imgUrl);
+            }
+            return;
+          }
           await fetchHumanResource();
         }
       },
@@ -313,15 +318,27 @@ function HumanResourcePage() {
                 )}
 
                 {/* Tạo bản sao */}
-                {<DropdownMenuItem onClick={() => handleTranslation(Number(resource?.id), languageFilter, translateDictionary[languageFilter][0])}>
+                {
+                  <DropdownMenuItem
+                    onClick={() =>
+                      handleTranslation(Number(resource?.id), languageFilter, translateDictionary[languageFilter][0])
+                    }
+                  >
                     <Languages />
                     {translateDictionary[languageFilter][1]}
-                  </DropdownMenuItem>}
+                  </DropdownMenuItem>
+                }
 
-                {<DropdownMenuItem onClick={() => handleTranslation(Number(resource?.id), languageFilter, translateDictionary[languageFilter][2])}>
+                {
+                  <DropdownMenuItem
+                    onClick={() =>
+                      handleTranslation(Number(resource?.id), languageFilter, translateDictionary[languageFilter][2])
+                    }
+                  >
                     <Languages />
                     {translateDictionary[languageFilter][3]}
-                  </DropdownMenuItem>}
+                  </DropdownMenuItem>
+                }
 
                 {/* Chỉ GLOBAL_ADMIN mới có quyền xóa */}
                 {role === UserRole.GLOBAL_ADMIN && (
