@@ -121,9 +121,9 @@ export const getAllHumanResourceStatisticByYear = async (year: number): Promise<
   }
 };
 
-export const translate = async (id: number, language: string): Promise<Boolean> => {
+export const translate = async (id: number, fromLanguage: string, toLanguage: string): Promise<Boolean> => {
   try {
-    const response = await instance.post(`member/translate/${id}/${language}`);
+    const response = await instance.post(`member/translate/${id}/${fromLanguage}/${toLanguage}`);
     if (response.data?.statusCode === 200 && response.data?.data) {
       return true;
     } else {

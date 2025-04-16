@@ -44,6 +44,12 @@ import { LoadingOverlay } from '@/app/components/LoadingOverlay';
 
 type btnActions = 'CREATE' | 'UPDATE' | 'SEE' | 'PRINT' | 'NULL';
 
+const translateDictionary = {
+  [LANGUAGE_OPTIONS[0].value]: ['EN', 'Tạo bản sao Tiếng Anh', 'ZH', 'Tạo bản sao Tiếng Trung'],
+  [LANGUAGE_OPTIONS[1].value]: ['VI', 'Tạo bản sao Tiếng Việt', 'ZH', 'Tạo bản sao Tiếng Trung'],
+  [LANGUAGE_OPTIONS[2].value]: ['VI', 'Tạo bản sao Tiếng Việt', 'EN', 'Tạo bản sao Tiếng Anh'],
+};
+
 function HumanResourcePage() {
   const [searchValue, setSearchValue] = useState<string>('');
   const [roleFilter, setRoleFilter] = useState<string>('');
@@ -143,10 +149,10 @@ function HumanResourcePage() {
     );
   };
 
-  const handleTranslation = (id: number, language: string) => {
+  const handleTranslation = (id: number, fromLanguage: string, toLanguage: string) => {
     execute(
       async () => {
-        const request = await translate(id, language);
+        const request = await translate(id, fromLanguage, toLanguage);
         if (request) {
           await fetchHumanResource();
         }
@@ -307,19 +313,15 @@ function HumanResourcePage() {
                 )}
 
                 {/* Tạo bản sao */}
-                {languageFilter === LANGUAGE_OPTIONS[0].value && (
-                  <DropdownMenuItem onClick={() => handleTranslation(Number(resource?.id), LANGUAGE_OPTIONS[1].value)}>
+                {<DropdownMenuItem onClick={() => handleTranslation(Number(resource?.id), languageFilter, translateDictionary[languageFilter][0])}>
                     <Languages />
-                    Tạo bản sao tiếng anh
-                  </DropdownMenuItem>
-                )}
+                    {translateDictionary[languageFilter][1]}
+                  </DropdownMenuItem>}
 
-                {languageFilter === LANGUAGE_OPTIONS[0].value && (
-                  <DropdownMenuItem onClick={() => handleTranslation(Number(resource?.id), LANGUAGE_OPTIONS[2].value)}>
+                {<DropdownMenuItem onClick={() => handleTranslation(Number(resource?.id), languageFilter, translateDictionary[languageFilter][2])}>
                     <Languages />
-                    Tạo bản sao tiếng trung
-                  </DropdownMenuItem>
-                )}
+                    {translateDictionary[languageFilter][3]}
+                  </DropdownMenuItem>}
 
                 {/* Chỉ GLOBAL_ADMIN mới có quyền xóa */}
                 {role === UserRole.GLOBAL_ADMIN && (
