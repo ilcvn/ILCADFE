@@ -8,12 +8,11 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { ColumnDef } from '@tanstack/react-table';
 import {
-  ArrowRight,
   Edit,
   EllipsisVertical,
   EyeIcon,
   IdCard,
-  Link2,
+  Languages,
   Mail,
   PhoneCall,
   PlusCircle,
@@ -24,15 +23,9 @@ import { useEffect, useState } from 'react';
 import HumanResourceForm from '../../components/human-resource/human-resoure-form';
 import type HumanResource from '@/app/models/features/human-resource';
 import withAuth from '@/app/components/withAuth';
-import { deleteHumanResourceById, getHumanResource, updateHumanResourceById } from '@/app/api/human-resource';
+import { deleteHumanResourceById, getHumanResource, translate, updateHumanResourceById } from '@/app/api/human-resource';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  HUMAN_RESOURCE_PEN_NAME_LABEL,
-  HUMAN_RESOURCE_ROLE_STYLES,
-  HUMAN_RESOURCE_ROLES_LABEL,
-  type HumanResourcePenName,
-  type HumanResourceRole,
-} from '@/app/enums/human-resource.enum';
+import { HUMAN_RESOURCE_ROLE_STYLES, HUMAN_RESOURCE_ROLES_LABEL, type HumanResourceRole } from '@/app/enums/human-resource.enum';
 import { cn } from '@/lib/utils';
 import { HUMAN_RESOURCE_OPTIONS } from '@/app/constants/humanResourceOption';
 import { toast } from 'sonner';
@@ -46,8 +39,16 @@ import { deletefileDataUploadthing } from '@/app/api/deleteImageUT';
 import { useApp } from '@/app/context/AppContext';
 import { UserRole } from '@/app/enums/user-account';
 import { LANGUAGE_OPTIONS } from '@/app/constants/languageOptions';
+import { useActionWithLoading } from '@/app/hooks/useActionWithLoading';
+import { LoadingOverlay } from '@/app/components/LoadingOverlay';
 
 type btnActions = 'CREATE' | 'UPDATE' | 'SEE' | 'PRINT' | 'NULL';
+
+const translateDictionary = {
+  [LANGUAGE_OPTIONS[0].value]: ['EN', 'Tạo bản sao Tiếng Anh', 'ZH', 'Tạo bản sao Tiếng Trung'],
+  [LANGUAGE_OPTIONS[1].value]: ['VI', 'Tạo bản sao Tiếng Việt', 'ZH', 'Tạo bản sao Tiếng Trung'],
+  [LANGUAGE_OPTIONS[2].value]: ['VI', 'Tạo bản sao Tiếng Việt', 'EN', 'Tạo bản sao Tiếng Anh'],
+};
 
 function HumanResourcePage() {
   const [searchValue, setSearchValue] = useState<string>('');
@@ -67,6 +68,8 @@ function HumanResourcePage() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
   const { role } = useApp();
+
+  const { isLoadingAction, execute } = useActionWithLoading();
 
   const navigation = useRouter();
 
@@ -100,16 +103,24 @@ function HumanResourcePage() {
   };
 
   const handleDelete = async (resource: HumanResource) => {
-    try {
-      const request = await deleteHumanResourceById(resource.id);
-      if (request) {
-        if (resource?.imgUrl) await deletefileDataUploadthing(resource?.imgUrl);
-        toast.success('Đã xóa nhân sự thành công');
-        fetchHumanResource();
-      } else {
-        toast.error('Xóa nhân sự thất bại');
-      }
-    } catch (error) {}
+    execute(
+      async () => {
+        const request = await deleteHumanResourceById(resource.id);
+        if (request) {
+          if (resource?.imgUrl) {
+            if (resource.language === LANGUAGE_OPTIONS[0].value) {
+              await deletefileDataUploadthing(resource?.imgUrl);
+            }
+            return;
+          }
+          await fetchHumanResource();
+        }
+      },
+      {
+        successMessage: 'Đã xóa nhân sự thành công',
+        errorMessage: 'Đã xóa nhân sự thất bại',
+      },
+    );
   };
 
   const handleCreate = () => {
@@ -119,27 +130,43 @@ function HumanResourcePage() {
   };
 
   const handleToggleShow = async (resource: HumanResource, checked: boolean) => {
-    try {
-      resource.isShow = checked;
-      const requestBody = {
-        fullName: resource?.fullName,
-        description: resource?.description,
-        gmail: resource?.gmail,
-        imgUrl: resource?.imgUrl,
-        phone: resource?.phone,
-        role: resource?.role,
-        isShow: resource?.isShow,
-      };
-      const request = await updateHumanResourceById(requestBody, resource.id);
-      if (request) {
-        toast.success('Cập nhật trạng thái hiển thị thành công');
-        fetchHumanResource();
-      } else {
-        toast.error('Cập nhật trạng thái hiển thị thất bại');
-      }
-    } catch (error: any) {
-      toast.error(error?.message || 'Có lỗi xảy ra');
-    }
+    execute(
+      async () => {
+        resource.isShow = checked;
+        const requestBody = {
+          fullName: resource?.fullName,
+          description: resource?.description,
+          gmail: resource?.gmail,
+          imgUrl: resource?.imgUrl,
+          phone: resource?.phone,
+          role: resource?.role,
+          isShow: resource?.isShow,
+        };
+        const request = await updateHumanResourceById(requestBody, resource.id);
+        if (request) {
+          await fetchHumanResource();
+        }
+      },
+      {
+        successMessage: 'Cập nhật trạng thái thành công!',
+        errorMessage: 'Cập nhật trạng thái thất bại!',
+      },
+    );
+  };
+
+  const handleTranslation = (id: number, fromLanguage: string, toLanguage: string) => {
+    execute(
+      async () => {
+        const request = await translate(id, fromLanguage, toLanguage);
+        if (request) {
+          await fetchHumanResource();
+        }
+      },
+      {
+        successMessage: 'Tạo bản sao thành công!',
+        errorMessage: 'Tạo bản sao thất bại!',
+      },
+    );
   };
 
   // Colunm Table
@@ -290,6 +317,29 @@ function HumanResourcePage() {
                   </DropdownMenuItem>
                 )}
 
+                {/* Tạo bản sao */}
+                {
+                  <DropdownMenuItem
+                    onClick={() =>
+                      handleTranslation(Number(resource?.id), languageFilter, translateDictionary[languageFilter][0])
+                    }
+                  >
+                    <Languages />
+                    {translateDictionary[languageFilter][1]}
+                  </DropdownMenuItem>
+                }
+
+                {
+                  <DropdownMenuItem
+                    onClick={() =>
+                      handleTranslation(Number(resource?.id), languageFilter, translateDictionary[languageFilter][2])
+                    }
+                  >
+                    <Languages />
+                    {translateDictionary[languageFilter][3]}
+                  </DropdownMenuItem>
+                }
+
                 {/* Chỉ GLOBAL_ADMIN mới có quyền xóa */}
                 {role === UserRole.GLOBAL_ADMIN && (
                   <DropdownMenuItem onClick={() => handleDelete(resource)}>
@@ -309,6 +359,8 @@ function HumanResourcePage() {
 
   return (
     <div className="">
+      <LoadingOverlay visible={isLoadingAction} />
+
       <HeaderContent title="Nhân Sự" subTitle="Quản lý thông tin nhân sự" />
 
       <Card className="px-4 py-2 shadow-md">
@@ -364,7 +416,7 @@ function HumanResourcePage() {
               setSearchValue('');
               setRoleFilter('');
               setIsShowFilter('');
-              setLanguageFilter('');
+              setLanguageFilter(LANGUAGE_OPTIONS[0].value);
               setPage(1);
             }}
           >

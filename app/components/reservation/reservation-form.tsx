@@ -23,6 +23,7 @@ import { getArticles } from '@/app/api/article';
 import type Article from '@/app/models/features/arcicle';
 import { LANGUAGE_OPTIONS } from '@/app/constants/languageOptions';
 import { Checkbox } from '@/components/ui/checkbox';
+import { ARTICLE_OPTIONS } from '@/app/constants/articleOptions';
 
 let ALL_SERVICES: Article[];
 
@@ -59,9 +60,7 @@ export default function ReservationForm({
     const fetchReservation = async () => {
       setIsLoading(true);
       try {
-        const data = await getArticles(1, 100000, 0, {
-          type: 'SERVICE',
-        });
+        const data = await getArticles(1, 100000, 0, {});
 
         if (data) {
           ALL_SERVICES = data?.articles;
@@ -360,20 +359,22 @@ export default function ReservationForm({
             </div>
 
             {mode === 'CREATE' && (
-              <div className="flex flex-col gap-y-2 col-span-4 lg:col-span-4">
+              <div className="max-h-[250px] flex flex-col gap-y-2 col-span-4 lg:col-span-4 overflow-y-auto">
                 <Label>Vấn đề:</Label>
-                {articles.map((article) => (
-                  <div key={article.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={article.id}
-                      checked={selectedItems.includes(Number(article.id))}
-                      onCheckedChange={() => handleCheckboxChange(Number(article.id))}
-                    />
-                    <label htmlFor="article.value" className="text-sm font-medium">
-                      {article.title}
-                    </label>
-                  </div>
-                ))}
+                {articles
+                  .filter((article) => article.type !== ARTICLE_OPTIONS[2].value)
+                  .map((article) => (
+                    <div key={article.id} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={article.id}
+                        checked={selectedItems.includes(Number(article.id))}
+                        onCheckedChange={() => handleCheckboxChange(Number(article.id))}
+                      />
+                      <label htmlFor="article.value" className="text-sm font-medium">
+                        {article.title}
+                      </label>
+                    </div>
+                  ))}
                 {errors.subject && <p className="text-red-500 text-sm">{errors.subject.message}</p>}
               </div>
             )}

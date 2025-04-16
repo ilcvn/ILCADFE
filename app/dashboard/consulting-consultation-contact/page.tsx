@@ -5,12 +5,14 @@ import { deleteReservationById, getReservation } from '@/app/api/reservation';
 import ConfirmDialog from '@/app/components/dashboard/ConfirmDialog';
 import { DataTable } from '@/app/components/dashboard/DataTable';
 import HeaderContent from '@/app/components/dashboard/HeaderContent';
+import { LoadingOverlay } from '@/app/components/LoadingOverlay';
 import ReservationForm from '@/app/components/reservation/reservation-form';
 import withAuth from '@/app/components/withAuth';
 import { RESERVATION_STATUS_OPTIONS } from '@/app/constants/reservationOptions';
 import { useApp } from '@/app/context/AppContext';
 import { STATUS_LABELS, STATUS_STYLES, type ReservationStatus } from '@/app/enums/reservation';
 import { UserRole } from '@/app/enums/user-account';
+import { useActionWithLoading } from '@/app/hooks/useActionWithLoading';
 import type Reservation from '@/app/models/features/reservation';
 import { formatDate } from '@/app/utils/formatDateUTC';
 import { Badge } from '@/components/ui/badge';
@@ -56,6 +58,8 @@ function ConsultingSchedule() {
 
   const { role } = useApp();
 
+  const { isLoadingAction, execute } = useActionWithLoading();
+
   const fetchReservation = async () => {
     setIsLoading(true);
     try {
@@ -87,18 +91,19 @@ function ConsultingSchedule() {
   };
 
   const handleDelete = async (resource: Reservation) => {
-    try {
-      const request = await deleteReservationById(resource.id);
-      if (request) {
-        if (resource?.file) await deletefileDataUploadthing(resource?.file);
-        toast.success('Đã xóa đặt lịch thành công');
-        fetchReservation();
-      } else {
-        toast.error('Xóa đặt lịch thất bại');
-      }
-    } catch (error: any) {
-      toast.error(error?.message || 'Mất kết nối với máy chủ, vui lòng đợi phản hồi');
-    }
+    execute(
+      async () => {
+        const request = await deleteReservationById(resource.id);
+        if (request) {
+          if (resource?.file) await deletefileDataUploadthing(resource?.file);
+          await fetchReservation();
+        }
+      },
+      {
+        successMessage: 'Đã xóa đặt lịch thành công',
+        errorMessage: 'Đã xóa đặt lịch thất bại',
+      },
+    );
   };
 
   const handleDeleteMultiple = async (resources: Reservation[]) => {
@@ -107,32 +112,54 @@ function ConsultingSchedule() {
       return;
     }
 
-    try {
-      const deletePromises = resources.map(async (resource) => {
-        const request = await deleteReservationById(resource.id);
-        if (request) {
-          if (resource?.file) await deletefileDataUploadthing(resource?.file);
-          return { success: true, id: resource.id };
-        } else {
-          return { success: false, id: resource.id };
-        }
-      });
+    // try {
+    //   const deletePromises = resources.map(async (resource) => {
+    //     const request = await deleteReservationById(resource.id);
+    //     if (request) {
+    //       if (resource?.file) await deletefileDataUploadthing(resource?.file);
+    //       return { success: true, id: resource.id };
+    //     } else {
+    //       return { success: false, id: resource.id };
+    //     }
+    //   });
 
-      const results = await Promise.all(deletePromises);
+    //   const results = await Promise.all(deletePromises);
 
-      const failedDeletes = results.filter((res) => !res.success);
+    //   const failedDeletes = results.filter((res) => !res.success);
 
-      if (failedDeletes.length > 0) {
-        toast.error(`Xóa thất bại ${failedDeletes.length} đặt lịch`);
-      } else {
-        toast.success('Đã xóa tất cả đặt lịch');
+    //   if (failedDeletes.length > 0) {
+    //     toast.error(`Xóa thất bại ${failedDeletes.length} đặt lịch`);
+    //   } else {
+    //     toast.success('Đã xóa tất cả đặt lịch');
+    //     setOpenConfirm(false);
+    //   }
+
+    //   fetchReservation();
+    // } catch (error: any) {
+    //   toast.error(error?.message || 'Mất kết nối với máy chủ, vui lòng đợi phản hồi');
+    // }
+
+    execute(
+      async () => {
+        const deletePromises = resources.map(async (resource) => {
+          const request = await deleteReservationById(resource.id);
+          if (request) {
+            if (resource?.file) await deletefileDataUploadthing(resource?.file);
+            return { success: true, id: resource.id };
+          } else {
+            return { success: false, id: resource.id };
+          }
+        });
+        await Promise.all(deletePromises);
+
         setOpenConfirm(false);
-      }
-
-      fetchReservation();
-    } catch (error: any) {
-      toast.error(error?.message || 'Mất kết nối với máy chủ, vui lòng đợi phản hồi');
-    }
+        await fetchReservation();
+      },
+      {
+        successMessage: 'Đã xóa tất cả đặt lịch',
+        errorMessage: `Xóa thất bại tất cả đặt lịch`,
+      },
+    );
   };
 
   const handleCreate = () => {
@@ -272,6 +299,8 @@ function ConsultingSchedule() {
 
   return (
     <div className="">
+      <LoadingOverlay visible={isLoadingAction} />
+
       <HeaderContent title="Tư Vấn - Liên Hệ" subTitle="Danh sách thông tin tư vấn - liên hệ" />
 
       <Card className="px-4 py-2 shadow-md">
