@@ -160,7 +160,7 @@ const Page = () => {
         setOpenConfirm(false);
         fetchReservation();
       } else {
-        toast.error('Cập nhật trạng thái hiển thị thất bại');
+        toast.error('Hủy lịch tư vấn - liên hệ thành công');
       }
     } catch (error: any) {
       toast.error(error?.message || 'Mất kết nối đến máy chủ, thử lại sau');
@@ -342,7 +342,7 @@ const Page = () => {
               title="Chưa có lịch tư vấn - liên hệ nào"
               description="Có thể tạo lịch tư vấn hoặc liên hệ mới bằng cách ấn vào nút tạo dưới đây"
               buttonText="Tạo mới"
-              href="/dashboard/consulting-schedule/consultation"
+              href="/dashboard/consulting-consultation-contact"
             />
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
