@@ -15,6 +15,7 @@ export default interface HumanResource {
   createDate: string;
   updateDate: string;
   isExist: boolean;
+  coppied_id: string;
   language: string;
   memberDetails: HumanResourceDetail[];
 }
