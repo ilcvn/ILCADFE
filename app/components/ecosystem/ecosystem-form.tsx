@@ -190,7 +190,7 @@ export default function EcosystemForm({
               <UploadDropzone
                 onUploadBegin={() => setIsUploading(true)}
                 onClientUploadComplete={(res) => {
-                  const url = res[0].url;
+                  const url = res[0].ufsUrl;
                   setCurrentEcoSystemImage(url);
                   setValue('imgUrl', url); // Cập nhật vào form
                   setIsUploading(false);

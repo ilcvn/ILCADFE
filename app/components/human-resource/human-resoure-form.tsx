@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { humanResourceFormSchema, type humanResourceFormData } from '@/app/schemas/human-resource-schema';
-import { createHumanResource, updateHumanResourceById } from '@/app/api/human-resource';
+import { createHumanResource, getImageUrl, updateHumanResourceById } from '@/app/api/human-resource';
 import { Textarea } from '@/components/ui/textarea';
 import {
   HUMAN_RESOURCE_OPTIONS,
@@ -194,10 +194,16 @@ export default function HumanResourceForm({
 
   const handleDeleteImage = async (imageUrl: string) => {
     try {
-      const request = await deletefileDataUploadthing(imageUrl);
+      let request;
+      if (imageUrl) {
+        const countImageUrl = await getImageUrl(imageUrl);
+        if (countImageUrl === 1) {
+          request = await deletefileDataUploadthing(imageUrl);
+        }
+      }
       setCurrentProfileImage('');
       setValue('imgUrl', '');
-      toast.success(request);
+      toast.success(request || 'File hoặc hình ảnh đã được xóa');
     } catch (error: any) {
       toast.error(error);
     }
@@ -496,7 +502,7 @@ export default function HumanResourceForm({
               <UploadDropzone
                 onUploadBegin={() => setIsUploading(true)}
                 onClientUploadComplete={(res) => {
-                  const url = res[0].url;
+                  const url = res[0].ufsUrl;
                   setCurrentProfileImage(url);
                   setValue('imgUrl', url); // Cập nhật vào form
                   setIsUploading(false);

@@ -23,7 +23,13 @@ import { useEffect, useState } from 'react';
 import HumanResourceForm from '../../components/human-resource/human-resoure-form';
 import type HumanResource from '@/app/models/features/human-resource';
 import withAuth from '@/app/components/withAuth';
-import { deleteHumanResourceById, getHumanResource, translate, updateHumanResourceById } from '@/app/api/human-resource';
+import {
+  deleteHumanResourceById,
+  getHumanResource,
+  getImageUrl,
+  translate,
+  updateHumanResourceById,
+} from '@/app/api/human-resource';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { HUMAN_RESOURCE_ROLE_STYLES, HUMAN_RESOURCE_ROLES_LABEL, type HumanResourceRole } from '@/app/enums/human-resource.enum';
 import { cn } from '@/lib/utils';
@@ -108,17 +114,17 @@ function HumanResourcePage() {
         const request = await deleteHumanResourceById(resource.id);
         if (request) {
           if (resource?.imgUrl) {
-            if (resource.language === LANGUAGE_OPTIONS[0].value) {
+            const countImageUrl = await getImageUrl(resource.imgUrl);
+            if (countImageUrl === 0) {
               await deletefileDataUploadthing(resource?.imgUrl);
             }
-            return;
           }
           await fetchHumanResource();
         }
       },
       {
         successMessage: 'Đã xóa nhân sự thành công',
-        errorMessage: 'Đã xóa nhân sự thất bại',
+        errorMessage: 'Xóa nhân sự thất bại',
       },
     );
   };

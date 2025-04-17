@@ -443,7 +443,7 @@ export default function ReservationForm({
               <UploadDropzone
                 onUploadBegin={() => setIsUploading(true)}
                 onClientUploadComplete={(res) => {
-                  const url = res[0].url;
+                  const url = res[0].ufsUrl;
                   const name = res[0].name;
                   setNameFileLabel(name);
                   setCurrentFileUrl(url);

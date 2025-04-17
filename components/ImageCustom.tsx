@@ -1,3 +1,4 @@
+import { getContentImageUrl } from '@/app/api/article';
 import { deletefileDataUploadthing } from '@/app/api/deleteImageUT';
 import { mergeAttributes } from '@tiptap/core';
 import Image from '@tiptap/extension-image';
@@ -44,8 +45,14 @@ export const CustomImage = Image.extend({
 
 const handleDeleteImage = async (imageUrl: string) => {
   try {
-    const request = await deletefileDataUploadthing(imageUrl);
-    toast.success(request);
+    let request;
+    if (imageUrl) {
+      const countContentImageUrl = await getContentImageUrl(imageUrl);
+      if (countContentImageUrl === 1) {
+        request = await deletefileDataUploadthing(imageUrl);
+      }
+    }
+    toast.success(request || 'File và hình ảnh đã được xóa');
   } catch (error: any) {
     toast.error(error);
   }
