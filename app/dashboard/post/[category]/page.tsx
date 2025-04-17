@@ -111,8 +111,6 @@ const PostPage = () => {
         if (request) {
           if (resource?.preview_img) {
             const countImageUrl = await getImageUrl(resource.preview_img);
-            console.log(countImageUrl);
-
             if (countImageUrl === 0) {
               await deletefileDataUploadthing(resource?.preview_img);
             }

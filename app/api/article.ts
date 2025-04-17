@@ -177,3 +177,22 @@ export const getImageUrl = async (preview_img: string): Promise<Number | null> =
     throw new Error(errorMessage);
   }
 };
+
+export const getContentImageUrl = async (image_content: string): Promise<Number | null> => {
+  try {
+    const response = await instance.get(`article/count/imageContent`, {
+      params: {
+        image_content: image_content,
+      },
+    });
+
+    if (response.data?.statusCode === 200) {
+      return response.data?.data;
+    } else {
+      return null;
+    }
+  } catch (error: any) {
+    const errorMessage = error.response?.data?.message;
+    throw new Error(errorMessage);
+  }
+};

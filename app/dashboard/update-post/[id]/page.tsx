@@ -67,12 +67,11 @@ function UpdatePostDynamic() {
 
   const handleDeleteImage = async (imageUrl: string) => {
     try {
-      const request = await deletefileDataUploadthing(imageUrl);
-
+      let request;
       if (imageUrl) {
         const countImageUrl = await getImageUrl(imageUrl);
-        if (countImageUrl === 0) {
-          await deletefileDataUploadthing(imageUrl);
+        if (countImageUrl === 1) {
+          request = await deletefileDataUploadthing(imageUrl);
         }
       }
       setCurrentPreviewImage('');
