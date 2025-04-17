@@ -158,3 +158,22 @@ export const translate = async (id: number, fromLanguage: string, toLanguage: st
     throw new Error(errorMessage);
   }
 };
+
+export const getImageUrl = async (preview_img: string): Promise<Number | null> => {
+  try {
+    const response = await instance.get(`article/count/image`, {
+      params: {
+        preview_img: preview_img,
+      },
+    });
+
+    if (response.data?.statusCode === 200) {
+      return response.data?.data;
+    } else {
+      return null;
+    }
+  } catch (error: any) {
+    const errorMessage = error.response?.data?.message;
+    throw new Error(errorMessage);
+  }
+};

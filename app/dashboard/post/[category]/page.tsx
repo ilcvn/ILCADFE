@@ -1,6 +1,6 @@
 'use client';
 
-import { deleteArticleById, getArticles, translate } from '@/app/api/article';
+import { deleteArticleById, getArticles, getImageUrl, translate } from '@/app/api/article';
 import { DataTable } from '@/app/components/dashboard/DataTable';
 import HeaderContent from '@/app/components/dashboard/HeaderContent';
 import withAuth from '@/app/components/withAuth';
@@ -110,7 +110,10 @@ const PostPage = () => {
         const request = await deleteArticleById(resource.id);
         if (request) {
           if (resource?.preview_img) {
-            if (resource.language === LANGUAGE_OPTIONS[0].value) {
+            const countImageUrl = await getImageUrl(resource.preview_img);
+            console.log(countImageUrl);
+
+            if (countImageUrl === 0) {
               await deletefileDataUploadthing(resource?.preview_img);
             }
           }

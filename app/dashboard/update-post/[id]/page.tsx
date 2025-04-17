@@ -1,6 +1,6 @@
 'use client';
 
-import { getArticleById, updateArticleById } from '@/app/api/article';
+import { getArticleById, getImageUrl, updateArticleById } from '@/app/api/article';
 import { deletefileDataUploadthing } from '@/app/api/deleteImageUT';
 import { SubmitButton } from '@/app/components/dashboard/SubmitButton';
 import withAuth from '@/app/components/withAuth';
@@ -68,6 +68,13 @@ function UpdatePostDynamic() {
   const handleDeleteImage = async (imageUrl: string) => {
     try {
       const request = await deletefileDataUploadthing(imageUrl);
+
+      if (imageUrl) {
+        const countImageUrl = await getImageUrl(imageUrl);
+        if (countImageUrl === 0) {
+          await deletefileDataUploadthing(imageUrl);
+        }
+      }
       setCurrentPreviewImage('');
       setValue('preview_img', '');
       toast.success(request);
@@ -200,7 +207,7 @@ function UpdatePostDynamic() {
                     <UploadDropzone
                       onUploadBegin={() => setIsUploading(true)}
                       onClientUploadComplete={(res) => {
-                        const url = res[0].url;
+                        const url = res[0].ufsUrl;
                         setCurrentPreviewImage(url);
                         setValue('preview_img', url);
                         setIsUploading(false);
