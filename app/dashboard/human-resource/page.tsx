@@ -310,12 +310,12 @@ function HumanResourcePage() {
                 </DropdownMenuItem>
 
                 {/* Chỉ GLOBAL_ADMIN mới có quyền Add profile  */}
-                {role === UserRole.GLOBAL_ADMIN && (
+                {/* {role === UserRole.GLOBAL_ADMIN && (
                   <DropdownMenuItem onClick={() => navigation.push(`/dashboard/generate-human-detail/${resource?.id}`)}>
                     <IdCard />
                     Cập nhật hồ sơ
                   </DropdownMenuItem>
-                )}
+                )} */}
 
                 {/* Tạo bản sao */}
                 {
