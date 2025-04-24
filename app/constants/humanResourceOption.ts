@@ -6,8 +6,8 @@ export const HUMAN_RESOURCE_OPTIONS = [
   { value: 'VICE_CHAIRMAN', label: 'Phó Chủ Tịch Hội Đồng' },
   { value: 'GROUP_PRESIDENT', label: 'Trưởng Ban' },
   { value: 'GROUP_VICE_PRESIDENT', label: 'Phó Ban' },
-  { value: 'ROOM_PRESIDENT', label: 'Trưởng Phòng' },
-  { value: 'ROOM_VICE_PRESIDENT', label: 'Phó Phòng' },
+  { value: 'ROOM_PRESIDENT', label: 'Chánh Văn Phòng' },
+  { value: 'ROOM_VICE_PRESIDENT', label: 'Phó Chánh Văn Phòng' },
   { value: 'MEMBER', label: 'Thành Viên' },
 ];
 

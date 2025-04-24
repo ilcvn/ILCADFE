@@ -19,8 +19,8 @@ export const HUMAN_RESOURCE_ROLES_LABEL: Record<HumanResourceRole, string> = {
   [HumanResourceRole.VICE_CHAIRMAN]: 'Phó Chủ Tịch Hội Đồng',
   [HumanResourceRole.GROUP_PRESIDENT]: 'Trưởng Ban',
   [HumanResourceRole.GROUP_VICE_PRESIDENT]: 'Phó Ban',
-  [HumanResourceRole.ROOM_PRESIDENT]: 'Trưởng Phòng',
-  [HumanResourceRole.ROOM_VICE_PRESIDENT]: 'Phó Phòng',
+  [HumanResourceRole.ROOM_PRESIDENT]: 'Chánh Văn Phòng',
+  [HumanResourceRole.ROOM_VICE_PRESIDENT]: 'Phó Chánh Văn Phòng',
   [HumanResourceRole.MEMBER]: 'Thành viên Hội Đồng',
 };
 
