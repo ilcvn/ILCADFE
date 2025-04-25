@@ -12,6 +12,7 @@ import {
   Lightbulb,
   List,
   ListOrdered,
+  Quote,
   Redo2,
   StrikethroughIcon,
   UnderlineIcon,
@@ -27,6 +28,7 @@ import { Separator } from './ui/separator';
 import { UploadButton } from '@/lib/uploadthing';
 import { useEffect, useState } from 'react';
 import { CustomImage } from './ImageCustom';
+import Link from '@tiptap/extension-link';
 
 const Editor = ({ value, onChange }: { value: string; onChange: (content: string) => void }) => {
   const [isSticky, setIsSticky] = useState(false);
@@ -49,6 +51,11 @@ const Editor = ({ value, onChange }: { value: string; onChange: (content: string
       Youtube.configure({
         controls: false,
         nocookie: true,
+      }),
+      Link.configure({
+        openOnClick: false,
+        autolink: true,
+        linkOnPaste: true,
       }),
     ],
     content: value || `<h2>Tiêu đề</h2><p>Giới thiệu ngắn về bài viết</p>`,
@@ -100,7 +107,29 @@ const Editor = ({ value, onChange }: { value: string; onChange: (content: string
   return (
     <div className="p-4 border rounded-lg">
       <h2 className="text-lg font-bold mb-2 text-primary">Trình soạn thảo</h2>
-      <div className={`space-x-2 flex flex-wrap ${isSticky ? 'fixed top-12 left-0 w-full bg-white shadow-lg z-50' : ''}`}>
+      <div
+        className={`space-x-2 flex flex-wrap ${
+          isSticky
+            ? 'fixed top-[60px] left-0 p-2 flex justify-center w-full border-t-[1px] border-primary bg-slate-50 shadow-lg z-50'
+            : ''
+        }`}
+      >
+        <button type="button" onClick={() => editor.chain().focus().undo().run()} className="px-2 py-1 border rounded">
+          <Undo2 size={18} />
+        </button>
+        <button type="button" onClick={() => editor.chain().focus().redo().run()} className="px-2 py-1 border rounded">
+          <Redo2 size={18} />
+        </button>
+
+        <div className="flex flex-col justify-center text-sm text-gray-400">|</div>
+
+        <button
+          type="button"
+          onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          className={`px-2 py-1 border rounded ${editor.isActive('blockquote') ? 'ring-2 ring-primary text-primary' : ''}`}
+        >
+          <Quote size={18} />
+        </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
@@ -128,6 +157,25 @@ const Editor = ({ value, onChange }: { value: string; onChange: (content: string
           className={`px-2 py-1 border rounded ${editor.isActive('strike') ? 'ring-2 ring-primary text-primary' : ''}`}
         >
           <StrikethroughIcon size={18} />
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            const previousUrl = editor.getAttributes('link').href;
+            const url = prompt('Nhập đường dẫn liên kết:', previousUrl || '');
+
+            if (url === null) return;
+
+            if (url === '') {
+              editor.chain().focus().unsetLink().run();
+              return;
+            }
+
+            editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+          }}
+          className={`px-2 py-1 border rounded ${editor.isActive('link') ? 'ring-2 ring-primary text-primary' : ''}`}
+        >
+          🔗
         </button>
         <button
           type="button"
@@ -183,6 +231,9 @@ const Editor = ({ value, onChange }: { value: string; onChange: (content: string
         >
           H6
         </button>
+
+        <div className="flex flex-col justify-center text-sm text-gray-400">|</div>
+
         <button
           type="button"
           onClick={() => editor.chain().focus().setTextAlign('left').run()}
@@ -210,7 +261,6 @@ const Editor = ({ value, onChange }: { value: string; onChange: (content: string
         >
           <AlignRight className="w-4 h-4" />
         </button>
-
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
@@ -225,12 +275,8 @@ const Editor = ({ value, onChange }: { value: string; onChange: (content: string
         >
           <ListOrdered size={18} />
         </button>
-        <button type="button" onClick={() => editor.chain().focus().undo().run()} className="px-2 py-1 border rounded">
-          <Undo2 size={18} />
-        </button>
-        <button type="button" onClick={() => editor.chain().focus().redo().run()} className="px-2 py-1 border rounded">
-          <Redo2 size={18} />
-        </button>
+
+        <div className="flex flex-col justify-center text-sm text-gray-400">|</div>
 
         <div className="flex items-center space-x-2">
           <input
@@ -258,7 +304,7 @@ const Editor = ({ value, onChange }: { value: string; onChange: (content: string
           </Label>
 
           <button type="button" onClick={() => editor.chain().focus().unsetColor().run()} className="px-2 py-1 border rounded">
-            Reset color
+            Đặt lại màu
           </button>
         </div>
       </div>
