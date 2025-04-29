@@ -153,7 +153,11 @@ const PostPage = () => {
     {
       accessorKey: 'title',
       header: 'TIÊU ĐỀ',
-      cell: ({ row }) => <span className="font-bold text-md text-primary">{row.getValue('title')}</span>,
+      cell: ({ row }) => {
+        const title = row.getValue('title') as string;
+        const truncatedTitle = title.length > 50 ? `${title.slice(0, 100)}...` : title;
+        return <span className="font-bold text-md text-primary">{truncatedTitle}</span>;
+      },
     },
     {
       accessorKey: 'type',
