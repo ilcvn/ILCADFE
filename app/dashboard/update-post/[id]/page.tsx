@@ -70,13 +70,13 @@ function UpdatePostDynamic() {
       let request;
       if (imageUrl) {
         const countImageUrl = await getImageUrl(imageUrl);
-        if (countImageUrl === 1) {
+        if (countImageUrl === 1 || countImageUrl === 0) {
           request = await deletefileDataUploadthing(imageUrl);
         }
       }
       setCurrentPreviewImage('');
       setValue('preview_img', '');
-      toast.success(request);
+      toast.success(request || 'File và hình ảnh đã được xóa');
     } catch (error: any) {
       toast.error(error);
     }

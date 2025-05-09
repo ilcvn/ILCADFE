@@ -215,7 +215,7 @@ export default function EcosystemForm({
                   setIsDialogOpen(false);
                 }}
               >
-                Hủy
+                Đóng
               </Button>
               <SubmitButton text="Lưu thông tin" variant="default" isPending={isPending || isUploading} />
             </div>
