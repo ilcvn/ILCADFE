@@ -197,7 +197,7 @@ export default function HumanResourceForm({
       let request;
       if (imageUrl) {
         const countImageUrl = await getImageUrl(imageUrl);
-        if (countImageUrl === 1) {
+        if (countImageUrl === 1 || countImageUrl === 0) {
           request = await deletefileDataUploadthing(imageUrl);
         }
       }
@@ -535,7 +535,7 @@ export default function HumanResourceForm({
                   setIsDialogOpen(false);
                 }}
               >
-                Hủy
+                Đóng
               </Button>
               <SubmitButton text="Lưu thông tin" variant="default" isPending={isPending || isUploading} />
             </div>

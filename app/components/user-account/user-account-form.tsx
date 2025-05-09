@@ -194,7 +194,7 @@ export default function UserAccountForm({
                   setIsDialogOpen(false);
                 }}
               >
-                Hủy
+                Đóng
               </Button>
               <SubmitButton text="Lưu thông tin" variant="default" isPending={isPending} />
             </div>

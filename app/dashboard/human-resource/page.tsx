@@ -229,7 +229,7 @@ function HumanResourcePage() {
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
           <PhoneCall className="h-4 w-4 text-green-600 font-bold animate-bounce" />
-          <span className="font-medium text-muted-foreground">{row.getValue('phone')}</span>
+          <span className="font-medium text-muted-foreground">{row.getValue('phone') || 'Chưa có số điện thoại'}</span>
         </div>
       ),
     },

@@ -156,11 +156,11 @@ const Page = () => {
       };
       const request = await updateReservationById(requestBody, id);
       if (request) {
-        toast.success('Cập nhật trạng thái hiển thị thành công');
+        toast.success('Hủy lịch tư vấn - liên hệ thành công');
         setOpenConfirm(false);
         fetchReservation();
       } else {
-        toast.error('Hủy lịch tư vấn - liên hệ thành công');
+        toast.error('Hủy thất bại');
       }
     } catch (error: any) {
       toast.error(error?.message || 'Mất kết nối đến máy chủ, thử lại sau');
@@ -391,7 +391,7 @@ const Page = () => {
                                 }}
                               >
                                 <Ban className="mr-2 size-4" />
-                                Hủy sự kiện
+                                Hủy lịch
                               </DropdownMenuItem>
                             </DropdownMenuGroup>
                           </DropdownMenuContent>
