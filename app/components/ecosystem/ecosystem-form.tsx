@@ -16,6 +16,8 @@ import { X } from 'lucide-react';
 import { UploadDropzone } from '@/lib/uploadthing';
 import { deletefileDataUploadthing } from '@/app/api/deleteImageUT';
 import { ECOSYSTEM_OPTIONS } from '@/app/constants/ecosystemOption';
+import { useActionWithLoading } from '@/app/hooks/useActionWithLoading';
+import Spinner from '../dashboard/Spinner';
 
 export default function EcosystemForm({
   mode,
@@ -44,6 +46,8 @@ export default function EcosystemForm({
     resolver: zodResolver(ecosystemFormSchema),
     defaultValues: { fullName: '', linkWebsite: '', imgUrl: '', typeEcosystem: '' },
   });
+
+  const { isLoadingAction, execute } = useActionWithLoading();
 
   const [state, submitAction, isPending] = useActionState(async (prevState: any, formData: EcosystemFormData) => {
     try {
@@ -81,14 +85,17 @@ export default function EcosystemForm({
   };
 
   const handleDeleteImage = async (imageUrl: string) => {
-    try {
-      const request = await deletefileDataUploadthing(imageUrl);
-      setCurrentEcoSystemImage('');
-      setValue('imgUrl', '');
-      toast.success(request);
-    } catch (error: any) {
-      toast.error(error);
-    }
+    execute(
+      async () => {
+        await deletefileDataUploadthing(imageUrl);
+        setCurrentEcoSystemImage('');
+        setValue('imgUrl', '');
+      },
+      {
+        successMessage: 'File hoặc hình ảnh đã được xóa',
+        errorMessage: 'Xóa File hoặc hình ảnh thất bại',
+      },
+    );
   };
 
   useEffect(() => {
@@ -180,10 +187,11 @@ export default function EcosystemForm({
                 <Button
                   onClick={() => handleDeleteImage(currentEcosystemImage)}
                   variant="destructive"
+                  disabled={isLoadingAction}
                   className="absolute w-4 h-7 -top-3 -right-3 rounded-full"
                   type="button"
                 >
-                  <X className="w-4 h-4" />
+                  {isLoadingAction ? <Spinner /> : <X className="w-4 h-4" />}
                 </Button>
               </div>
             ) : (
@@ -210,6 +218,7 @@ export default function EcosystemForm({
               <Button
                 type="button"
                 variant={'outline'}
+                disabled={isLoadingAction || isUploading}
                 onClick={() => {
                   reset({ fullName: '', linkWebsite: '', imgUrl: '', typeEcosystem: '' });
                   setIsDialogOpen(false);
@@ -217,7 +226,7 @@ export default function EcosystemForm({
               >
                 Đóng
               </Button>
-              <SubmitButton text="Lưu thông tin" variant="default" isPending={isPending || isUploading} />
+              <SubmitButton text="Lưu thông tin" variant="default" isPending={isPending || isUploading || isLoadingAction} />
             </div>
           </DialogFooter>
         </form>

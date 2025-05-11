@@ -10,7 +10,7 @@ export const reservationFormSchema = z.object({
   gmail: z.string().email('Email không hợp lệ').optional(),
   address: z.string().optional(),
   subject: z.string().optional(),
-  file: z.string().optional(),
+  file: z.string().nullable().optional(),
   language: z.string().min(1, 'Ngôn ngữ là bắt buộc'),
 });
 

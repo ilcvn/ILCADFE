@@ -2,6 +2,7 @@
 
 import { createArticle, getImageUrl } from '@/app/api/article';
 import { deletefileDataUploadthing } from '@/app/api/deleteImageUT';
+import Spinner from '@/app/components/dashboard/Spinner';
 import { SubmitButton } from '@/app/components/dashboard/SubmitButton';
 import withAuth from '@/app/components/withAuth';
 import { ARTICLE_OPTIONS } from '@/app/constants/articleOptions';
@@ -9,6 +10,7 @@ import { LANGUAGE_OPTIONS } from '@/app/constants/languageOptions';
 import { useApp } from '@/app/context/AppContext';
 import { ARTICLE_TYPE_LABEL, ArticleType } from '@/app/enums/article';
 import { UserRole } from '@/app/enums/user-account';
+import { useActionWithLoading } from '@/app/hooks/useActionWithLoading';
 import { articleFormSchema, type ArticleFormData } from '@/app/schemas/article-schema';
 import Editor from '@/components/editor';
 import { Badge } from '@/components/ui/badge';
@@ -46,6 +48,8 @@ function GeneratePostDynamic() {
   if (!validCategories.includes(params?.generate_category as string)) {
     notFound();
   }
+
+  const { isLoadingAction, execute } = useActionWithLoading();
 
   const {
     register,
@@ -92,20 +96,23 @@ function GeneratePostDynamic() {
   };
 
   const handleDeleteImage = async (imageUrl: string) => {
-    try {
-      let request;
-      if (imageUrl) {
-        const countImageUrl = await getImageUrl(imageUrl);
-        if (countImageUrl === 1 || countImageUrl === 0) {
-          request = await deletefileDataUploadthing(imageUrl);
+    execute(
+      async () => {
+        let request;
+        if (imageUrl) {
+          const countImageUrl = await getImageUrl(imageUrl);
+          if (countImageUrl === 1 || countImageUrl === 0) {
+            request = await deletefileDataUploadthing(imageUrl);
+          }
         }
-      }
-      setCurrentPreviewImage('');
-      setValue('preview_img', '');
-      toast.success(request || 'File và hình ảnh đã được xóa');
-    } catch (error: any) {
-      toast.error(error);
-    }
+        setCurrentPreviewImage('');
+        setValue('preview_img', '');
+      },
+      {
+        successMessage: 'File hoặc hình ảnh đã được xóa',
+        errorMessage: 'Xóa File hoặc hình ảnh thất bại',
+      },
+    );
   };
 
   useEffect(() => {
@@ -209,10 +216,11 @@ function GeneratePostDynamic() {
                       <Button
                         onClick={() => handleDeleteImage(currentPreviewImage)}
                         variant="destructive"
-                        className="absolute w-6 h-6 -top-3 -right-3 rounded-full"
+                        disabled={isLoadingAction}
+                        className="absolute w-4 h-7 -top-3 -right-3 rounded-full"
                         type="button"
                       >
-                        <X className="w-5 h-5" />
+                        {isLoadingAction ? <Spinner /> : <X className="w-4 h-4" />}
                       </Button>
                     </div>
                   ) : (
@@ -270,7 +278,7 @@ function GeneratePostDynamic() {
             </div>
           </CardContent>
           <CardFooter className="justify-end">
-            <SubmitButton text="Lưu / Đăng bài" variant="default" isPending={isPending || isPending} />
+            <SubmitButton text="Lưu / Đăng bài" variant="default" isPending={isPending || isPending || isLoadingAction} />
           </CardFooter>
         </form>
       </Card>
