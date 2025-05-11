@@ -1,29 +1,27 @@
 'use client';
 
+import { deletefileDataUploadthing } from '@/app/api/deleteImageUT';
+import { createHumanResource, getImageUrl, updateHumanResourceById } from '@/app/api/human-resource';
 import { SubmitButton } from '@/app/components/dashboard/SubmitButton';
+import { HUMAN_RESOURCE_DEPARTMENT_OPTIONS, HUMAN_RESOURCE_OPTIONS } from '@/app/constants/humanResourceOption';
+import { LANGUAGE_OPTIONS } from '@/app/constants/languageOptions';
+import { useActionWithLoading } from '@/app/hooks/useActionWithLoading';
 import type HumanResource from '@/app/models/features/human-resource';
+import { humanResourceFormSchema, type humanResourceFormData } from '@/app/schemas/human-resource-schema';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { UploadDropzone } from '@/lib/uploadthing';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus, X } from 'lucide-react';
 import Image from 'next/image';
 import { startTransition, useActionState, useEffect, useState } from 'react';
-import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { humanResourceFormSchema, type humanResourceFormData } from '@/app/schemas/human-resource-schema';
-import { createHumanResource, getImageUrl, updateHumanResourceById } from '@/app/api/human-resource';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  HUMAN_RESOURCE_OPTIONS,
-  HUMAN_RESOURCE_PEN_NAME_OPTIONS,
-  HUMAN_RESOURCE_DEPARTMENT_OPTIONS,
-} from '@/app/constants/humanResourceOption';
-import { deletefileDataUploadthing } from '@/app/api/deleteImageUT';
-import { LANGUAGE_OPTIONS } from '@/app/constants/languageOptions';
+import { toast } from 'sonner';
+import Spinner from '../dashboard/Spinner';
 
 export default function HumanResourceForm({
   mode,
@@ -48,6 +46,8 @@ export default function HumanResourceForm({
       //penName: HUMAN_RESOURCE_PEN_NAME_OPTIONS[0].value,
     },
   ]);
+
+  const { isLoadingAction, execute } = useActionWithLoading();
 
   const {
     register,
@@ -193,20 +193,23 @@ export default function HumanResourceForm({
   };
 
   const handleDeleteImage = async (imageUrl: string) => {
-    try {
-      let request;
-      if (imageUrl) {
-        const countImageUrl = await getImageUrl(imageUrl);
-        if (countImageUrl === 1 || countImageUrl === 0) {
-          request = await deletefileDataUploadthing(imageUrl);
+    execute(
+      async () => {
+        let request;
+        if (imageUrl) {
+          const countImageUrl = await getImageUrl(imageUrl);
+          if (countImageUrl === 1 || countImageUrl === 0) {
+            request = await deletefileDataUploadthing(imageUrl);
+          }
         }
-      }
-      setCurrentProfileImage('');
-      setValue('imgUrl', '');
-      toast.success(request || 'File hoặc hình ảnh đã được xóa');
-    } catch (error: any) {
-      toast.error(error);
-    }
+        setCurrentProfileImage('');
+        setValue('imgUrl', '');
+      },
+      {
+        successMessage: 'File hoặc hình ảnh đã được xóa',
+        errorMessage: 'Xóa File hoặc hình ảnh thất bại',
+      },
+    );
   };
 
   useEffect(() => {
@@ -312,6 +315,7 @@ export default function HumanResourceForm({
             {mode === 'CREATE' ? 'Điền các thông tin của nhân sự' : 'Cập nhật các thông tin của nhân sự'}
           </DialogDescription>
         </DialogHeader>
+
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 items-center gap-4">
             {/* Full Name */}
@@ -492,10 +496,11 @@ export default function HumanResourceForm({
                 <Button
                   onClick={() => handleDeleteImage(currentProfileImage)}
                   variant="destructive"
+                  disabled={isLoadingAction}
                   className="absolute w-4 h-7 -top-3 -right-3 rounded-full"
                   type="button"
                 >
-                  <X className="w-4 h-4" />
+                  {isLoadingAction ? <Spinner /> : <X className="w-4 h-4" />}
                 </Button>
               </div>
             ) : (
@@ -520,6 +525,7 @@ export default function HumanResourceForm({
           <DialogFooter className="mt-4">
             <div className="flex items-center gap-2 justify-end">
               <Button
+                disabled={isLoadingAction || isUploading}
                 type="button"
                 variant={'outline'}
                 onClick={() => {
@@ -537,7 +543,7 @@ export default function HumanResourceForm({
               >
                 Đóng
               </Button>
-              <SubmitButton text="Lưu thông tin" variant="default" isPending={isPending || isUploading} />
+              <SubmitButton text="Lưu thông tin" variant="default" isPending={isPending || isUploading || isLoadingAction} />
             </div>
           </DialogFooter>
         </form>

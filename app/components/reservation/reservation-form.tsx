@@ -24,6 +24,8 @@ import type Article from '@/app/models/features/arcicle';
 import { LANGUAGE_OPTIONS } from '@/app/constants/languageOptions';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ARTICLE_OPTIONS } from '@/app/constants/articleOptions';
+import { useActionWithLoading } from '@/app/hooks/useActionWithLoading';
+import Spinner from '../dashboard/Spinner';
 
 let ALL_SERVICES: Article[];
 
@@ -55,6 +57,8 @@ export default function ReservationForm({
   const handleCheckboxChange = (articleId: number) => {
     setSelectedItems((prev) => (prev.includes(articleId) ? prev.filter((id) => id !== articleId) : [...prev, articleId]));
   };
+
+  const { isLoadingAction, execute } = useActionWithLoading();
 
   useEffect(() => {
     const fetchReservation = async () => {
@@ -219,14 +223,17 @@ export default function ReservationForm({
   };
 
   const handleDeleteFile = async (imageUrl: string) => {
-    try {
-      const request = await deletefileDataUploadthing(imageUrl);
-      setCurrentFileUrl('');
-      setValue('file', '');
-      toast.success(request);
-    } catch (error: any) {
-      toast.error(error);
-    }
+    execute(
+      async () => {
+        await deletefileDataUploadthing(imageUrl);
+        setCurrentFileUrl('');
+        setValue('file', '');
+      },
+      {
+        successMessage: 'File hoặc hình ảnh đã được xóa',
+        errorMessage: 'Xóa File hoặc hình ảnh thất bại',
+      },
+    );
   };
 
   return (
@@ -432,10 +439,11 @@ export default function ReservationForm({
                   <Button
                     onClick={() => handleDeleteFile(currentFileUrl)}
                     variant="destructive"
-                    className="w-2 h-7 -top-3 -right-2 rounded-full"
+                    disabled={isLoadingAction}
+                    className="absolute w-4 h-7 -top-4 -right-3 rounded-full"
                     type="button"
                   >
-                    <X className="w-4 h-4"></X>
+                    {isLoadingAction ? <Spinner /> : <X className="w-4 h-4" />}
                   </Button>
                 </div>
               </div>
@@ -465,6 +473,7 @@ export default function ReservationForm({
               <Button
                 type="button"
                 variant={'outline'}
+                disabled={isLoadingAction || isUploading}
                 onClick={() => {
                   reset({
                     fullName: '',
@@ -479,13 +488,12 @@ export default function ReservationForm({
                     language: '',
                   });
                   setSelectedItems([]);
-
                   setIsDialogOpen(false);
                 }}
               >
                 Đóng
               </Button>
-              <SubmitButton text="Lưu thông tin" variant="default" isPending={isPending || isUploading} />
+              <SubmitButton text="Lưu thông tin" variant="default" isPending={isPending || isUploading || isLoadingAction} />
             </div>
           </DialogFooter>
         </form>
