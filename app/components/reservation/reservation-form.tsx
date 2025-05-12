@@ -13,7 +13,7 @@ import { startTransition, useActionState, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { SubmitButton } from '../dashboard/SubmitButton';
-import { CalendarIcon, Download, X } from 'lucide-react';
+import { CalendarIcon, Download, RotateCcwIcon, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DatePicker } from '@/components/ui/datepicker';
 import { formatDate } from '@/app/utils/formatDateUTC';
@@ -93,6 +93,7 @@ export default function ReservationForm({
     trigger,
     handleSubmit,
     reset,
+    getValues,
     formState: { errors },
   } = useForm<ReservationFormData>({
     resolver: zodResolver(reservationFormSchema),
@@ -440,7 +441,7 @@ export default function ReservationForm({
                     onClick={() => handleDeleteFile(currentFileUrl)}
                     variant="destructive"
                     disabled={isLoadingAction}
-                    className="absolute w-4 h-7 -top-4 -right-3 rounded-full"
+                    className="absolute w-4 h-7 -top-5 -right-7 rounded-full"
                     type="button"
                   >
                     {isLoadingAction ? <Spinner /> : <X className="w-4 h-4" />}
@@ -475,24 +476,35 @@ export default function ReservationForm({
                 variant={'outline'}
                 disabled={isLoadingAction || isUploading}
                 onClick={() => {
-                  reset({
-                    fullName: '',
-                    address: '',
-                    consultDate: '',
-                    content: '',
-                    file: '',
-                    gmail: '',
-                    phone: '',
-                    status: '',
-                    subject: '',
-                    language: '',
-                  });
-                  setSelectedItems([]);
                   setIsDialogOpen(false);
                 }}
               >
                 Đóng
               </Button>
+              {mode === 'CREATE' && (
+                <Button
+                  type="button"
+                  variant={'outline'}
+                  onClick={() => {
+                    reset({
+                      fullName: '',
+                      address: '',
+                      consultDate: '',
+                      content: '',
+                      file: '',
+                      gmail: '',
+                      phone: '',
+                      status: '',
+                      subject: '',
+                      language: '',
+                    });
+                    setSelectedItems([]);
+                  }}
+                >
+                  <RotateCcwIcon className="w-6 h-6" />
+                  Làm mới
+                </Button>
+              )}
               <SubmitButton text="Lưu thông tin" variant="default" isPending={isPending || isUploading || isLoadingAction} />
             </div>
           </DialogFooter>

@@ -1,7 +1,7 @@
 'use client';
 
 import { deletefileDataUploadthing } from '@/app/api/deleteImageUT';
-import { deleteReservationById, getReservation } from '@/app/api/reservation';
+import { deleteReservationById, getReservation, updateReservationById } from '@/app/api/reservation';
 import ConfirmDialog from '@/app/components/dashboard/ConfirmDialog';
 import { DataTable } from '@/app/components/dashboard/DataTable';
 import HeaderContent from '@/app/components/dashboard/HeaderContent';
@@ -150,9 +150,9 @@ function ConsultingSchedule() {
             return { success: false, id: resource.id };
           }
         });
+        setOpenConfirm(false);
         await Promise.all(deletePromises);
 
-        setOpenConfirm(false);
         await fetchReservation();
       },
       {
@@ -254,13 +254,46 @@ function ConsultingSchedule() {
       header: 'TRẠNG THÁI',
       cell: ({ row }) => {
         const status = row.getValue('status') as ReservationStatus | null;
-        const statusLabel = status ? STATUS_LABELS[status] : 'Không xác định';
-        const statusStyle = status ? STATUS_STYLES[status] : 'bg-gray-100 text-gray-500';
+        const resource = row.original;
+
+        const handleStatusChange = async (newStatus: ReservationStatus) => {
+          resource.status = newStatus;
+
+          execute(
+            async () => {
+              const requestBody = { ...resource };
+
+              const request = await updateReservationById(requestBody, resource?.id);
+              if (request) {
+                await fetchReservation();
+              }
+            },
+            {
+              successMessage: 'Cập nhật trạng thái tư vấn thành công',
+              errorMessage: 'Cập nhật trạng thái hiển thị thất bại',
+            },
+          );
+        };
 
         return (
-          <Badge variant="outline" className={cn('flex items-center px-2 py-1 rounded-md w-max', statusStyle)}>
-            {statusLabel}
-          </Badge>
+          <Select
+            value={status || ''}
+            onValueChange={(value) => handleStatusChange(value as ReservationStatus)}
+            disabled={role !== UserRole.GLOBAL_ADMIN}
+          >
+            <SelectTrigger className="w-36">
+              <SelectValue placeholder="Chọn trạng thái" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {Object.entries(STATUS_LABELS).map(([key, label]) => (
+                  <SelectItem key={key} value={key}>
+                    <Badge className={cn(STATUS_STYLES[key as ReservationStatus], 'pointer-events-none rounded')}>{label}</Badge>
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         );
       },
     },
