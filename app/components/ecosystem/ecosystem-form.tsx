@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 import { SubmitButton } from '../dashboard/SubmitButton';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { RotateCcwIcon, X } from 'lucide-react';
 import { UploadDropzone } from '@/lib/uploadthing';
 import { deletefileDataUploadthing } from '@/app/api/deleteImageUT';
 import { ECOSYSTEM_OPTIONS } from '@/app/constants/ecosystemOption';
@@ -220,12 +220,23 @@ export default function EcosystemForm({
                 variant={'outline'}
                 disabled={isLoadingAction || isUploading}
                 onClick={() => {
-                  reset({ fullName: '', linkWebsite: '', imgUrl: '', typeEcosystem: '' });
                   setIsDialogOpen(false);
                 }}
               >
                 Đóng
               </Button>
+              {mode === 'CREATE' && (
+                <Button
+                  type="button"
+                  variant={'outline'}
+                  onClick={() => {
+                    reset({ fullName: '', linkWebsite: '', imgUrl: '', typeEcosystem: '' });
+                  }}
+                >
+                  <RotateCcwIcon className="w-6 h-6" />
+                  Làm mới
+                </Button>
+              )}
               <SubmitButton text="Lưu thông tin" variant="default" isPending={isPending || isUploading || isLoadingAction} />
             </div>
           </DialogFooter>

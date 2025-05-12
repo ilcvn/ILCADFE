@@ -15,6 +15,7 @@ import { ROLE_OPTIONS } from '@/app/constants/routeOption';
 import { createUserIsAdmin, createUserIsGlobalAdmin, createUserIsIT, updateUserById } from '@/app/api/auth';
 import { UserRole } from '@/app/enums/user-account';
 import { Button } from '@/components/ui/button';
+import { RotateCcwIcon } from 'lucide-react';
 
 export default function UserAccountForm({
   mode,
@@ -190,12 +191,23 @@ export default function UserAccountForm({
                 type="button"
                 variant={'outline'}
                 onClick={() => {
-                  reset({ name: '', userName: '', password: '' });
                   setIsDialogOpen(false);
                 }}
               >
                 Đóng
               </Button>
+              {mode === 'CREATE' && (
+                <Button
+                  type="button"
+                  variant={'outline'}
+                  onClick={() => {
+                    reset({ name: '', userName: '', password: '' });
+                  }}
+                >
+                  <RotateCcwIcon className="w-6 h-6" />
+                  Làm mới
+                </Button>
+              )}
               <SubmitButton text="Lưu thông tin" variant="default" isPending={isPending} />
             </div>
           </DialogFooter>

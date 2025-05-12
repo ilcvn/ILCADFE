@@ -16,7 +16,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { Textarea } from '@/components/ui/textarea';
 import { UploadDropzone } from '@/lib/uploadthing';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Plus, X } from 'lucide-react';
+import { Plus, RotateCcwIcon, X } from 'lucide-react';
 import Image from 'next/image';
 import { startTransition, useActionState, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -529,20 +529,31 @@ export default function HumanResourceForm({
                 type="button"
                 variant={'outline'}
                 onClick={() => {
-                  reset();
-                  setValue('language', LANGUAGE_OPTIONS[0].value);
-                  setDepartmentRolesPenNameListAdd([
-                    {
-                      department: HUMAN_RESOURCE_DEPARTMENT_OPTIONS[0].value,
-                      role: HUMAN_RESOURCE_OPTIONS[0].value,
-                      //penName: HUMAN_RESOURCE_PEN_NAME_OPTIONS[0].value,
-                    },
-                  ]);
                   setIsDialogOpen(false);
                 }}
               >
                 Đóng
               </Button>
+              {mode === 'CREATE' && (
+                <Button
+                  type="button"
+                  variant={'outline'}
+                  onClick={() => {
+                    reset();
+                    setValue('language', LANGUAGE_OPTIONS[0].value);
+                    setDepartmentRolesPenNameListAdd([
+                      {
+                        department: HUMAN_RESOURCE_DEPARTMENT_OPTIONS[0].value,
+                        role: HUMAN_RESOURCE_OPTIONS[0].value,
+                        //penName: HUMAN_RESOURCE_PEN_NAME_OPTIONS[0].value,
+                      },
+                    ]);
+                  }}
+                >
+                  <RotateCcwIcon className="w-6 h-6" />
+                  Làm mới
+                </Button>
+              )}
               <SubmitButton text="Lưu thông tin" variant="default" isPending={isPending || isUploading || isLoadingAction} />
             </div>
           </DialogFooter>
