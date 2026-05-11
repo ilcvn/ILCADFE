@@ -3,6 +3,7 @@ export enum ArticleType {
   SERVICE = 'SERVICE',
   NEWS = 'NEWS',
   RESEARCH = 'RESEARCH',
+  ADMISSIONS = 'ADMISSIONS',
 }
 
 export const ARTICLE_TYPE_LABEL: Record<ArticleType, string> = {
@@ -10,6 +11,7 @@ export const ARTICLE_TYPE_LABEL: Record<ArticleType, string> = {
   [ArticleType.SERVICE]: 'Dịch Vụ',
   [ArticleType.NEWS]: 'Tin Tức',
   [ArticleType.RESEARCH]: 'Nghiên Cứu Khoa Học Và Xây Dựng Pháp Luật',
+  [ArticleType.ADMISSIONS]: 'Tuyển Sinh',
 };
 
 export const ARTICLE_TYPE_STYLES: Record<ArticleType, string> = {
@@ -17,4 +19,5 @@ export const ARTICLE_TYPE_STYLES: Record<ArticleType, string> = {
   [ArticleType.SERVICE]: 'bg-blue-100 text-blue-600',
   [ArticleType.NEWS]: 'bg-purple-100 text-purple-600',
   [ArticleType.RESEARCH]: 'bg-green-100 text-green-600',
+  [ArticleType.ADMISSIONS]: 'bg-orange-100 text-orange-600',
 };

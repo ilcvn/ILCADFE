@@ -4,7 +4,7 @@ import { deleteArticleById, getArticles, getImageUrl, translate } from '@/app/ap
 import { DataTable } from '@/app/components/dashboard/DataTable';
 import HeaderContent from '@/app/components/dashboard/HeaderContent';
 import withAuth from '@/app/components/withAuth';
-import { ARTICLE_TYPE_LABEL, ARTICLE_TYPE_STYLES, type ArticleType } from '@/app/enums/article';
+import { ARTICLE_TYPE_LABEL, ARTICLE_TYPE_STYLES, ArticleType } from '@/app/enums/article';
 import type Article from '@/app/models/features/arcicle';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -38,7 +38,13 @@ const PostPage = () => {
   const params = useParams();
   const navigation = useRouter();
 
-  const validCategories = ['training', 'service', 'news', 'research'];
+  const validCategories = [
+    ArticleType.TRAINING.toLocaleLowerCase(),
+    ArticleType.SERVICE.toLocaleLowerCase(),
+    ArticleType.NEWS.toLocaleLowerCase(),
+    ArticleType.RESEARCH.toLocaleLowerCase(),
+    ArticleType.ADMISSIONS.toLocaleLowerCase(),
+  ];
 
   if (!validCategories.includes(params?.category as string)) {
     notFound();
@@ -84,17 +90,20 @@ const PostPage = () => {
 
   const toCreatePost = () => {
     switch (params?.category) {
-      case 'training':
+      case ArticleType.TRAINING.toLocaleLowerCase():
         navigation.push(`/dashboard/generate-post/training`);
         break;
-      case 'service':
+      case ArticleType.SERVICE.toLocaleLowerCase():
         navigation.push(`/dashboard/generate-post/service`);
         break;
-      case 'news':
+      case ArticleType.NEWS.toLocaleLowerCase():
         navigation.push(`/dashboard/generate-post/news`);
         break;
-      case 'research':
+      case ArticleType.RESEARCH.toLocaleLowerCase():
         navigation.push(`/dashboard/generate-post/research`);
+        break;
+      case ArticleType.ADMISSIONS.toLocaleLowerCase():
+        navigation.push(`/dashboard/generate-post/admissions`);
         break;
 
       default:
