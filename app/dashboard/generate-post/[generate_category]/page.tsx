@@ -37,7 +37,13 @@ function GeneratePostDynamic() {
 
   const [labelType, setLabelType] = useState<String | null>('');
 
-  const validCategories = ['training', 'service', 'news', 'research'];
+  const validCategories = [
+    ArticleType.TRAINING.toLocaleLowerCase(),
+    ArticleType.SERVICE.toLocaleLowerCase(),
+    ArticleType.NEWS.toLocaleLowerCase(),
+    ArticleType.RESEARCH.toLocaleLowerCase(),
+    ArticleType.ADMISSIONS.toLocaleLowerCase(),
+  ];
 
   const [isUploading, setIsUploading] = useState(false);
 
@@ -129,7 +135,9 @@ function GeneratePostDynamic() {
 
     return (
       <div className="flex flex-col gap-y-2 col-span-1">
-        <Label>Loại bài báo</Label>
+        <Label>
+          <span className="text-red-500">*</span> Loại bài báo
+        </Label>
         <Select
           disabled
           defaultValue={selectedArticleOption.value}
@@ -163,7 +171,7 @@ function GeneratePostDynamic() {
           <CardTitle className="text-primary">Tạo Bài Báo Mới</CardTitle>
           <CardDescription>Hãy điền thông tin bài báo để hoàn tất đăng bài</CardDescription>
           <CardDescription>
-            <Badge className="mt-1">{labelType}</Badge>
+            <Badge className="mt-2 px-3 py-2">{labelType}</Badge>
           </CardDescription>
         </CardHeader>
         <form

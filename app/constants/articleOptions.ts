@@ -3,4 +3,5 @@ export const ARTICLE_OPTIONS = [
   { value: 'SERVICE', label: 'Dịch Vụ' },
   { value: 'NEWS', label: 'Tin Tức' },
   { value: 'RESEARCH', label: 'Nghiên Cứu Khoa Học Và Xây Dựng Pháp Luật' },
+  { value: 'ADMISSIONS', label: 'Tuyển Sinh' },
 ];

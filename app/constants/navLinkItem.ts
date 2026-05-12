@@ -56,6 +56,12 @@ export const navLinks: NavLink[] = [
         isActive: false,
         group: 'management',
       },
+      {
+        path: '/dashboard/post/admissions',
+        label: 'Tuyển Sinh',
+        isActive: false,
+        group: 'management',
+      },
     ],
     group: 'management',
     isActive: false,

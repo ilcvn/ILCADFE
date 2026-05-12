@@ -10,6 +10,7 @@ import {
   BoldIcon,
   ItalicIcon,
   Lightbulb,
+  Link2,
   List,
   ListOrdered,
   Quote,
@@ -18,6 +19,10 @@ import {
   UnderlineIcon,
   Undo2,
   YoutubeIcon,
+  ChevronDown,
+  X,
+  Check,
+  ImageIcon,
 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Color } from '@tiptap/extension-color';
@@ -26,396 +31,571 @@ import TextAlign from '@tiptap/extension-text-align';
 import Youtube from '@tiptap/extension-youtube';
 import { Separator } from './ui/separator';
 import { UploadButton } from '@/lib/uploadthing';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { CustomImage } from './ImageCustom';
 import Link from '@tiptap/extension-link';
+import IntroductionArticle from './IntroductionArticle';
 
+// ─── Toast ────────────────────────────────────────────────────────────────────
+type ToastType = 'success' | 'error' | 'info';
+interface Toast {
+  id: number;
+  message: string;
+  type: ToastType;
+}
+
+function useToast() {
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const add = useCallback((message: string, type: ToastType = 'success') => {
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, message, type }]);
+    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3000);
+  }, []);
+  return { toasts, add };
+}
+
+function ToastContainer({ toasts }: { toasts: Toast[] }) {
+  const colors: Record<ToastType, string> = {
+    success: 'bg-green-600',
+    error: 'bg-red-500',
+    info: 'bg-blue-500',
+  };
+  return (
+    <div className="fixed bottom-4 right-4 z-[100] flex flex-col gap-2">
+      {toasts.map((t) => (
+        <div
+          key={t.id}
+          className={`${colors[t.type]} text-white text-sm px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2`}
+        >
+          {t.type === 'success' && <Check size={14} />}
+          {t.message}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── Modal dùng chung ─────────────────────────────────────────────────────────
+function Modal({
+  open,
+  onClose,
+  title,
+  children,
+}: {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  children: React.ReactNode;
+}) {
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [open, onClose]);
+
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
+      <div
+        className="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl p-5 w-full max-w-sm mx-4 border border-gray-200 dark:border-zinc-700"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-semibold text-base">{title}</h3>
+          <button onClick={onClose} className="p-1 rounded hover:bg-gray-100 dark:hover:bg-zinc-800">
+            <X size={16} />
+          </button>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ─── Dropdown Heading ─────────────────────────────────────────────────────────
+const HEADING_OPTIONS = [
+  { label: 'Đoạn văn', value: 0 },
+  { label: 'Tiêu đề 1', value: 1 },
+  { label: 'Tiêu đề 2', value: 2 },
+  { label: 'Tiêu đề 3', value: 3 },
+  { label: 'Tiêu đề 4', value: 4 },
+  { label: 'Tiêu đề 5', value: 5 },
+  { label: 'Tiêu đề 6', value: 6 },
+] as const;
+
+function HeadingDropdown({ editor }: { editor: ReturnType<typeof useEditor> }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  if (!editor) return null;
+
+  const active =
+    HEADING_OPTIONS.find((h) => (h.value === 0 ? !editor.isActive('heading') : editor.isActive('heading', { level: h.value }))) ??
+    HEADING_OPTIONS[0];
+
+  const apply = (value: number) => {
+    if (value === 0) editor.chain().focus().setParagraph().run();
+    else
+      editor
+        .chain()
+        .focus()
+        .toggleHeading({ level: value as 1 | 2 | 3 | 4 | 5 | 6 })
+        .run();
+    setOpen(false);
+  };
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-1 px-2 py-1 border rounded text-sm min-w-[100px] justify-between hover:bg-gray-50"
+      >
+        <span>{active.label}</span>
+        <ChevronDown size={14} />
+      </button>
+      {open && (
+        <div className="absolute top-full left-0 mt-1 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg shadow-lg z-50 overflow-hidden min-w-[130px]">
+          {HEADING_OPTIONS.map((h) => (
+            <button
+              key={h.value}
+              type="button"
+              onClick={() => apply(h.value)}
+              className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-zinc-800 flex items-center justify-between ${
+                active.value === h.value ? 'text-primary font-medium' : ''
+              }`}
+            >
+              {h.label}
+              {active.value === h.value && <Check size={12} />}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── ToolbarButton ────────────────────────────────────────────────────────────
+function ToolbarBtn({
+  active,
+  onClick,
+  title,
+  children,
+}: {
+  active?: boolean;
+  onClick: () => void;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      title={title}
+      onClick={onClick}
+      className={`px-2 py-1 border rounded transition-colors hover:bg-gray-50 dark:hover:bg-zinc-800 ${
+        active ? 'ring-2 ring-primary text-primary bg-primary/5' : ''
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+// ─── Editor chính ─────────────────────────────────────────────────────────────
 const Editor = ({ value, onChange }: { value: string; onChange: (content: string) => void }) => {
   const [isSticky, setIsSticky] = useState(false);
   const [isShowFormat, setIsShowFormat] = useState(false);
+  const { toasts, add: addToast } = useToast();
 
-  const [height, setHeight] = useState('480');
-  const [width, setWidth] = useState('640');
+  // Modal YouTube
+  const [ytOpen, setYtOpen] = useState(false);
+  const [ytUrl, setYtUrl] = useState('');
+  const [ytWidth, setYtWidth] = useState('640');
+  const [ytHeight, setYtHeight] = useState('480');
+
+  // Modal Link
+  const [linkOpen, setLinkOpen] = useState(false);
+  const [linkUrl, setLinkUrl] = useState('');
 
   const editor = useEditor({
     extensions: [
       StarterKit,
       Underline,
-      // Image,
       CustomImage,
       TextStyle,
       Color,
-      TextAlign.configure({
-        types: ['heading', 'paragraph'],
-      }),
-      Youtube.configure({
-        controls: false,
-        nocookie: true,
-      }),
-      Link.configure({
-        openOnClick: false,
-        autolink: true,
-        linkOnPaste: true,
-      }),
+      TextAlign.configure({ types: ['heading', 'paragraph'] }),
+      Youtube.configure({ controls: false, nocookie: true }),
+      Link.configure({ openOnClick: false, autolink: true, linkOnPaste: true }),
     ],
     content: value || `<h2>Tiêu đề</h2><p>Giới thiệu ngắn về bài viết</p>`,
-    onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
-    },
+    onUpdate: ({ editor }) => onChange(editor.getHTML()),
     editorProps: {
       attributes: {
         class:
-          'h-full cursor-text rounded-md border p-5 ring-offset-background focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
+          'h-full min-h-[360px] cursor-text rounded-md border p-5 ring-offset-background focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
         spellcheck: 'false',
       },
     },
     immediatelyRender: false,
   });
 
-  const addYoutubeVideo = () => {
-    const url = prompt('Nhập đường dẫn Youtube');
-
-    if (url) {
-      editor?.commands.setYoutubeVideo({
-        src: url,
-        width: Math.max(320, parseInt(width, 10)) || 640,
-        height: Math.max(180, parseInt(height, 10)) || 480,
-      });
-    }
-  };
-
-  // Cập nhật nội dung editor khi giá trị value thay đổi
+  // Sync value từ bên ngoài
   useEffect(() => {
     if (editor && value !== editor.getHTML()) {
       editor.commands.setContent(value);
     }
-
-    const handleScroll = () => {
-      if (window.scrollY > 600) {
-        setIsSticky(true);
-      } else {
-        setIsSticky(false);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
   }, [value, editor]);
+
+  // Sticky toolbar
+  useEffect(() => {
+    const handler = () => setIsSticky(window.scrollY > 600);
+    window.addEventListener('scroll', handler);
+    return () => window.removeEventListener('scroll', handler);
+  }, []);
+
+  // Mở modal link với URL hiện tại
+  const openLinkModal = () => {
+    const prev = editor?.getAttributes('link').href || '';
+    setLinkUrl(prev);
+    setLinkOpen(true);
+  };
+
+  const applyLink = () => {
+    if (!editor) return;
+    if (linkUrl === '') {
+      editor.chain().focus().unsetLink().run();
+    } else {
+      editor.chain().focus().extendMarkRange('link').setLink({ href: linkUrl }).run();
+    }
+    setLinkOpen(false);
+    addToast('Đã chèn liên kết', 'success');
+  };
+
+  const applyYoutube = () => {
+    if (!editor || !ytUrl.trim()) return;
+    editor.commands.setYoutubeVideo({
+      src: ytUrl,
+      width: Math.max(320, parseInt(ytWidth, 10)) || 640,
+      height: Math.max(180, parseInt(ytHeight, 10)) || 480,
+    });
+    setYtOpen(false);
+    setYtUrl('');
+    addToast('Đã chèn video YouTube', 'success');
+  };
 
   if (!editor) return null;
 
+  const divider = <div className="flex flex-col justify-center text-gray-300 select-none">│</div>;
+
   return (
-    <div className="p-4 border rounded-lg">
-      <h2 className="text-lg font-bold mb-2 text-primary">Trình soạn thảo</h2>
-      <div
-        className={`space-x-2 flex flex-wrap ${
-          isSticky
-            ? 'fixed top-[60px] left-0 p-2 flex justify-center w-full border-t-[1px] border-primary bg-slate-50 shadow-lg z-50'
-            : ''
-        }`}
-      >
-        <button type="button" onClick={() => editor.chain().focus().undo().run()} className="px-2 py-1 border rounded">
-          <Undo2 size={18} />
-        </button>
-        <button type="button" onClick={() => editor.chain().focus().redo().run()} className="px-2 py-1 border rounded">
-          <Redo2 size={18} />
-        </button>
+    <>
+      <ToastContainer toasts={toasts} />
 
-        <div className="flex flex-col justify-center text-sm text-gray-400">|</div>
-
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().toggleBlockquote().run()}
-          className={`px-2 py-1 border rounded ${editor.isActive('blockquote') ? 'ring-2 ring-primary text-primary' : ''}`}
-        >
-          <Quote size={18} />
-        </button>
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().toggleBold().run()}
-          className={`px-2 py-1 border rounded ${editor.isActive('bold') ? 'ring-2 ring-primary text-primary' : ''}`}
-        >
-          <BoldIcon size={18} />
-        </button>
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={`px-2 py-1 border rounded ${editor.isActive('italic') ? 'ring-2 ring-primary text-primary' : ''}`}
-        >
-          <ItalicIcon size={18} />
-        </button>
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().toggleUnderline().run()}
-          className={`px-2 py-1 border rounded ${editor.isActive('underline') ? 'ring-2 ring-primary text-primary' : ''}`}
-        >
-          <UnderlineIcon size={18} />
-        </button>
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().toggleStrike().run()}
-          className={`px-2 py-1 border rounded ${editor.isActive('strike') ? 'ring-2 ring-primary text-primary' : ''}`}
-        >
-          <StrikethroughIcon size={18} />
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            const previousUrl = editor.getAttributes('link').href;
-            const url = prompt('Nhập đường dẫn liên kết:', previousUrl || '');
-
-            if (url === null) return;
-
-            if (url === '') {
-              editor.chain().focus().unsetLink().run();
-              return;
-            }
-
-            editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
-          }}
-          className={`px-2 py-1 border rounded ${editor.isActive('link') ? 'ring-2 ring-primary text-primary' : ''}`}
-        >
-          🔗
-        </button>
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-          className={`px-2 py-1 border rounded ${
-            editor.isActive('heading', { level: 1 }) ? 'ring-2 ring-primary text-primary' : ''
-          }`}
-        >
-          H1
-        </button>
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          className={`px-2 py-1 border rounded ${
-            editor.isActive('heading', { level: 2 }) ? 'ring-2 ring-primary text-primary' : ''
-          }`}
-        >
-          H2
-        </button>
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-          className={`px-2 py-1 border rounded ${
-            editor.isActive('heading', { level: 3 }) ? 'ring-2 ring-primary text-primary' : ''
-          }`}
-        >
-          H3
-        </button>
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
-          className={`px-2 py-1 border rounded ${
-            editor.isActive('heading', { level: 4 }) ? 'ring-2 ring-primary text-primary' : ''
-          }`}
-        >
-          H4
-        </button>
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().toggleHeading({ level: 5 }).run()}
-          className={`px-2 py-1 border rounded ${
-            editor.isActive('heading', { level: 5 }) ? 'ring-2 ring-primary text-primary' : ''
-          }`}
-        >
-          H5
-        </button>
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().toggleHeading({ level: 6 }).run()}
-          className={`px-2 py-1 border rounded ${
-            editor.isActive('heading', { level: 6 }) ? 'ring-2 ring-primary text-primary' : ''
-          }`}
-        >
-          H6
-        </button>
-
-        <div className="flex flex-col justify-center text-sm text-gray-400">|</div>
-
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().setTextAlign('left').run()}
-          className={`px-2 py-1 border rounded ${
-            editor.isActive({ textAlign: 'left' }) ? 'ring-2 ring-primary text-primary' : ''
-          }`}
-        >
-          <AlignLeft className="w-4 h-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().setTextAlign('center').run()}
-          className={`px-2 py-1 border rounded ${
-            editor.isActive({ textAlign: 'center' }) ? 'ring-2 ring-primary text-primary' : ''
-          }`}
-        >
-          <AlignCenter className="w-4 h-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().setTextAlign('right').run()}
-          className={`px-2 py-1 border rounded ${
-            editor.isActive({ textAlign: 'right' }) ? 'ring-2 ring-primary text-primary' : ''
-          }`}
-        >
-          <AlignRight className="w-4 h-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={`px-2 py-1 border rounded ${editor.isActive('bulletList') ? 'ring-2 ring-primary text-primary' : ''}`}
-        >
-          <List size={18} />
-        </button>
-        <button
-          type="button"
-          onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={`px-2 py-1 border rounded ${editor.isActive('orderedList') ? 'ring-2 ring-primary text-primary' : ''}`}
-        >
-          <ListOrdered size={18} />
-        </button>
-
-        <div className="flex flex-col justify-center text-sm text-gray-400">|</div>
-
-        <div className="flex items-center space-x-2">
-          <input
-            type="color"
-            id="colorPicker"
-            onInput={(event) =>
-              editor &&
-              editor
-                .chain()
-                .focus()
-                .setColor((event.target as HTMLInputElement).value)
-                .run()
-            }
-            value={editor?.getAttributes('textStyle').color || '#000000'}
-            className="opacity-0 absolute w-0 h-0"
-          />
-          <Label
-            htmlFor="colorPicker"
-            className="w-10 h-10 rounded-full border-2 border-gray-300 cursor-pointer flex items-center justify-center"
-            style={{
-              backgroundColor: editor?.getAttributes('textStyle').color || '#000000',
-            }}
-          >
-            🎨
-          </Label>
-
-          <button type="button" onClick={() => editor.chain().focus().unsetColor().run()} className="px-2 py-1 border rounded">
-            Đặt lại màu
-          </button>
-        </div>
-      </div>
-
-      <div className="py-2">
-        <div className="flex-col lg:flex lg:flex-row lg:items-center gap-2">
-          <div className="flex flex-col">
-            <label>Chiều dài</label>
+      {/* Modal YouTube */}
+      <Modal open={ytOpen} onClose={() => setYtOpen(false)} title="Chèn video YouTube">
+        <div className="flex flex-col gap-3">
+          <div>
+            <Label className="text-sm mb-1 block">Đường dẫn YouTube</Label>
             <input
-              id="width"
-              type="number"
-              min="320"
-              max="1024"
-              placeholder="Width"
-              value={width}
-              onChange={(event) => setWidth(event.target.value)}
-              className="w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brandPrimary"
+              type="url"
+              placeholder="https://www.youtube.com/watch?v=..."
+              value={ytUrl}
+              onChange={(e) => setYtUrl(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && applyYoutube()}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              autoFocus
             />
           </div>
-          <div className="flex flex-col">
-            <label>Chiều rộng</label>
-            <input
-              id="height"
-              type="number"
-              min="180"
-              max="720"
-              placeholder="Height"
-              value={height}
-              onChange={(event) => setHeight(event.target.value)}
-              className="w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brandPrimary"
-            />
-          </div>
-          <div className="flex flex-col">
-            <label>Đường dẫn URL</label>
-            <div>
-              <button
-                type="button"
-                id="add"
-                onClick={addYoutubeVideo}
-                className="px-4 py-2 bg-red-500 text-black font-semibold rounded-md shadow-md hover:bg-opacity-90 transition-all"
-              >
-                <div className="flex gap-1 text-white">
-                  <span>Youtube</span>
-                  <YoutubeIcon className="text-white text-center block" />
-                </div>
-              </button>
+          <div className="flex gap-3">
+            <div className="flex-1">
+              <Label className="text-sm mb-1 block">Chiều rộng (px)</Label>
+              <input
+                type="number"
+                min="320"
+                max="1024"
+                value={ytWidth}
+                onChange={(e) => setYtWidth(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            <div className="flex-1">
+              <Label className="text-sm mb-1 block">Chiều cao (px)</Label>
+              <input
+                type="number"
+                min="180"
+                max="720"
+                value={ytHeight}
+                onChange={(e) => setYtHeight(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              />
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Editor */}
-      <div className="flex-col space-y-4 lg:flex lg:flex-row lg:gap-x-4 py-3 lg:space-y-0 relative">
-        {/* Trình soạn thảo */}
-
-        <div className="w-full relative">
-          <button
-            onClick={() => setIsShowFormat(!isShowFormat)}
-            type="button"
-            className="bg-yellow-500 p-2 rounded-md w-max absolute right-[-6px] -translate-x-1/2 top-6 -translate-y-1/2 z-40 
-             transition transform active:scale-90 focus:bg-yellow-600 hover:bg-yellow-600"
-          >
-            <Lightbulb className="w-4 h-4 text-white" />
-          </button>
-          <EditorContent editor={editor} className="ProseMirror" />
-        </div>
-
-        {/* Bố cục mẫu */}
-
-        {isShowFormat && (
-          <div className="border rounded-lg p-4 bg-gray-100 sticky top-4 w-full lg:w-max">
-            <h2 className="text-lg font-bold mb-2 text-primary">Bố cục mẫu</h2>
-            <hr className="mb-1 border-muted-foreground" />
-            <article>
-              <h1 className="text-xl font-bold">Tiêu đề bài viết</h1>
-              <p className="italic">Giới thiệu ngắn gọn về nội dung bài viết.</p>
-
-              <h2 className="text-lg font-bold mt-3">Mục 1: Giới thiệu</h2>
-              <p>Đây là phần giới thiệu về bài viết.</p>
-
-              <h2 className="text-lg font-bold mt-3">Mục 2: Nội dung chính</h2>
-              <p>Chi tiết nội dung bài viết.</p>
-              <img src="https://placehold.co/800x400/6A00F5/white" alt="Mô tả hình ảnh" className="rounded-lg my-2" />
-              <p className="text-sm text-gray-500">Chú thích ảnh: Hình minh họa.</p>
-
-              <h2 className="text-lg font-bold mt-3">Mục 3: Kết luận</h2>
-              <p>Tóm tắt nội dung chính.</p>
-              <img src="https://placehold.co/800x400/6A00F5/white" alt="Hình ảnh minh họa" className="rounded-lg my-2" />
-              <p className="text-sm text-gray-500">Chú thích ảnh: Hình minh họa.</p>
-            </article>
+          <div className="flex justify-end gap-2 mt-1">
+            <button
+              type="button"
+              onClick={() => setYtOpen(false)}
+              className="px-4 py-2 text-sm border rounded-md hover:bg-gray-50"
+            >
+              Hủy
+            </button>
+            <button
+              type="button"
+              onClick={applyYoutube}
+              disabled={!ytUrl.trim()}
+              className="px-4 py-2 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 disabled:opacity-50 flex items-center gap-2"
+            >
+              <YoutubeIcon size={15} />
+              Chèn video
+            </button>
           </div>
-        )}
-      </div>
+        </div>
+      </Modal>
 
-      <Separator className=" border-gray-300" />
-      {/* Upload nhiều ảnh */}
-      <div className="flex flex-col gap-2 items-center py-4">
-        <Label className="text-primary font-bold">Tải hình ảnh lên trình soạn thảo</Label>
-        <UploadButton
-          endpoint="singleImageUploader"
-          onClientUploadComplete={(res) => {
-            if (res && res.length > 0) {
-              res.forEach((file) => {
-                editor.chain().focus().setImage({ src: file.ufsUrl }).run();
-              });
-            }
-          }}
-          onUploadError={(error) => alert(`Lỗi: ${error.message}`)}
-        />
+      {/* Modal Link */}
+      <Modal open={linkOpen} onClose={() => setLinkOpen(false)} title="Chèn liên kết">
+        <div className="flex flex-col gap-3">
+          <div>
+            <Label className="text-sm mb-1 block">Địa chỉ URL</Label>
+            <input
+              type="url"
+              placeholder="https://example.com"
+              value={linkUrl}
+              onChange={(e) => setLinkUrl(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && applyLink()}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              autoFocus
+            />
+            <p className="text-xs text-gray-400 mt-1">Để trống để xóa liên kết hiện tại.</p>
+          </div>
+          <div className="flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setLinkOpen(false)}
+              className="px-4 py-2 text-sm border rounded-md hover:bg-gray-50"
+            >
+              Hủy
+            </button>
+            <button
+              type="button"
+              onClick={applyLink}
+              className="px-4 py-2 text-sm bg-primary text-white rounded-md hover:bg-primary/90 flex items-center gap-2"
+            >
+              <Link2 size={14} />
+              {linkUrl ? 'Chèn liên kết' : 'Xóa liên kết'}
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Editor wrapper */}
+      <div className="p-4 border rounded-lg">
+        <h2 className="text-lg font-bold mb-3 text-primary">Trình soạn thảo</h2>
+
+        {/* Toolbar */}
+        <div
+          className={`flex flex-wrap items-center gap-1 ${
+            isSticky
+              ? 'fixed top-[60px] left-0 px-4 py-2 w-full border-b border-primary bg-white dark:bg-zinc-900 shadow-md z-50'
+              : 'mb-3'
+          }`}
+        >
+          {/* Undo / Redo */}
+          <ToolbarBtn title="Hoàn tác (Ctrl+Z)" onClick={() => editor.chain().focus().undo().run()}>
+            <Undo2 size={16} />
+          </ToolbarBtn>
+          <ToolbarBtn title="Làm lại (Ctrl+Y)" onClick={() => editor.chain().focus().redo().run()}>
+            <Redo2 size={16} />
+          </ToolbarBtn>
+
+          {divider}
+
+          {/* Heading dropdown */}
+          <HeadingDropdown editor={editor} />
+
+          {divider}
+
+          {/* Text format */}
+          <ToolbarBtn
+            title="In đậm (Ctrl+B)"
+            active={editor.isActive('bold')}
+            onClick={() => editor.chain().focus().toggleBold().run()}
+          >
+            <BoldIcon size={16} />
+          </ToolbarBtn>
+          <ToolbarBtn
+            title="In nghiêng (Ctrl+I)"
+            active={editor.isActive('italic')}
+            onClick={() => editor.chain().focus().toggleItalic().run()}
+          >
+            <ItalicIcon size={16} />
+          </ToolbarBtn>
+          <ToolbarBtn
+            title="Gạch chân (Ctrl+U)"
+            active={editor.isActive('underline')}
+            onClick={() => editor.chain().focus().toggleUnderline().run()}
+          >
+            <UnderlineIcon size={16} />
+          </ToolbarBtn>
+          <ToolbarBtn
+            title="Gạch ngang"
+            active={editor.isActive('strike')}
+            onClick={() => editor.chain().focus().toggleStrike().run()}
+          >
+            <StrikethroughIcon size={16} />
+          </ToolbarBtn>
+          <ToolbarBtn
+            title="Trích dẫn"
+            active={editor.isActive('blockquote')}
+            onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          >
+            <Quote size={16} />
+          </ToolbarBtn>
+          <ToolbarBtn title="Chèn / Sửa liên kết" active={editor.isActive('link')} onClick={openLinkModal}>
+            <Link2 size={16} />
+          </ToolbarBtn>
+
+          {divider}
+
+          {/* Alignment */}
+          <ToolbarBtn
+            title="Căn trái"
+            active={editor.isActive({ textAlign: 'left' })}
+            onClick={() => editor.chain().focus().setTextAlign('left').run()}
+          >
+            <AlignLeft size={16} />
+          </ToolbarBtn>
+          <ToolbarBtn
+            title="Căn giữa"
+            active={editor.isActive({ textAlign: 'center' })}
+            onClick={() => editor.chain().focus().setTextAlign('center').run()}
+          >
+            <AlignCenter size={16} />
+          </ToolbarBtn>
+          <ToolbarBtn
+            title="Căn phải"
+            active={editor.isActive({ textAlign: 'right' })}
+            onClick={() => editor.chain().focus().setTextAlign('right').run()}
+          >
+            <AlignRight size={16} />
+          </ToolbarBtn>
+
+          {divider}
+
+          {/* Lists */}
+          <ToolbarBtn
+            title="Danh sách không thứ tự"
+            active={editor.isActive('bulletList')}
+            onClick={() => editor.chain().focus().toggleBulletList().run()}
+          >
+            <List size={16} />
+          </ToolbarBtn>
+          <ToolbarBtn
+            title="Danh sách có thứ tự"
+            active={editor.isActive('orderedList')}
+            onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          >
+            <ListOrdered size={16} />
+          </ToolbarBtn>
+
+          {divider}
+
+          {/* Color picker */}
+          <div className="flex items-center gap-1">
+            <input
+              type="color"
+              id="colorPicker"
+              onInput={(e) =>
+                editor
+                  .chain()
+                  .focus()
+                  .setColor((e.target as HTMLInputElement).value)
+                  .run()
+              }
+              value={editor.getAttributes('textStyle').color || '#000000'}
+              className="opacity-0 absolute w-0 h-0"
+            />
+            <Label
+              htmlFor="colorPicker"
+              title="Chọn màu chữ"
+              className="w-8 h-8 rounded border border-gray-300 cursor-pointer flex items-center justify-center text-base"
+              style={{ backgroundColor: editor.getAttributes('textStyle').color || '#000000' }}
+            >
+              🎨
+            </Label>
+            <button
+              type="button"
+              title="Xóa màu chữ"
+              onClick={() => editor.chain().focus().unsetColor().run()}
+              className="px-2 py-1 border rounded text-xs hover:bg-gray-50"
+            >
+              Xóa màu
+            </button>
+          </div>
+
+          {divider}
+
+          {/* Insert YouTube */}
+          <button
+            type="button"
+            title="Chèn video YouTube"
+            onClick={() => setYtOpen(true)}
+            className="px-2 py-1 border rounded bg-red-50 hover:bg-red-100 text-red-600 flex items-center gap-1 text-sm"
+          >
+            <YoutubeIcon size={16} />
+            <span className="hidden sm:inline">YouTube</span>
+          </button>
+        </div>
+
+        {/* Nội dung editor + bố cục mẫu */}
+        <div className="flex flex-col lg:flex-row gap-4 relative">
+          <div className="w-full relative">
+            {/* Nút bố cục mẫu */}
+            <button
+              onClick={() => setIsShowFormat((v) => !v)}
+              type="button"
+              title="Xem bố cục mẫu"
+              className="absolute right-2 top-2 z-10 bg-yellow-400 hover:bg-yellow-500 active:scale-95 transition-transform p-1.5 rounded-md flex items-center gap-1 text-xs text-white font-medium shadow-sm"
+            >
+              <Lightbulb size={14} />
+              <span className="hidden sm:inline">Bố cục mẫu</span>
+            </button>
+            <EditorContent editor={editor} className="ProseMirror" />
+          </div>
+
+          {isShowFormat && <IntroductionArticle setIsShowFormat={setIsShowFormat} />}
+        </div>
+
+        <Separator className="my-4 border-gray-200" />
+
+        {/* Upload ảnh */}
+        <div className="flex flex-col items-center gap-2 py-2">
+          <Label className="text-primary font-semibold flex items-center gap-1.5">
+            <ImageIcon size={15} />
+            Tải hình ảnh vào bài viết
+          </Label>
+          <UploadButton
+            endpoint="singleImageUploader"
+            onClientUploadComplete={(res) => {
+              if (res?.length) {
+                res.forEach((file) => editor.chain().focus().setImage({ src: file.ufsUrl }).run());
+                addToast(`Đã chèn ${res.length} ảnh vào bài viết`, 'success');
+              }
+            }}
+            onUploadError={(error) => addToast(`Lỗi upload: ${error.message}`, 'error')}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
